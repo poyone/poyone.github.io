@@ -1,0 +1,302 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Transformer &amp; Self-Attention | Attention Is A Talent</title><meta name="author" content="Poy One"><meta name="copyright" content="Poy One"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="阿三博客地址 李沐老师 48分钟讲解 encoder-decoder中(KV–Q)的运算:  KQ相乘就是单个q对所有k的相似度作为attention score(给这个K值多少注意力)，与单个v做加权和(权值来自KQ) 再通过注意力分数与V向量相乘，得到每个V应该多大的缩放， 进行相加后就得到了最终V应该是什么样子了 李沐老师 56分 对multi-head输出和linear层相较于RNN的讲解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transformer &amp; Self-Attention">
+<meta property="og:url" content="http://example.com/2022/11/21/NLP%E7%AC%94%E8%AE%B0/Transformer%20Self-Attention/index.html">
+<meta property="og:site_name" content="Attention Is A Talent">
+<meta property="og:description" content="阿三博客地址 李沐老师 48分钟讲解 encoder-decoder中(KV–Q)的运算:  KQ相乘就是单个q对所有k的相似度作为attention score(给这个K值多少注意力)，与单个v做加权和(权值来自KQ) 再通过注意力分数与V向量相乘，得到每个V应该多大的缩放， 进行相加后就得到了最终V应该是什么样子了 李沐老师 56分 对multi-head输出和linear层相较于RNN的讲解">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3237314.jpg">
+<meta property="article:published_time" content="2022-11-21T09:00:10.398Z">
+<meta property="article:modified_time" content="2022-11-21T09:03:06.787Z">
+<meta property="article:author" content="Poy One">
+<meta property="article:tag" content="Transformer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3237314.jpg"><link rel="shortcut icon" href="https://s1.imagehub.cc/images/2022/11/20/375c6e3994a1f2472da5b34c26e48f18ab750e42.jpg942w_1332h_progressive.webp"><link rel="canonical" href="http://example.com/2022/11/21/NLP%E7%AC%94%E8%AE%B0/Transformer%20Self-Attention/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Transformer & Self-Attention',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-11-21 17:03:06'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/11/20/375c6e3994a1f2472da5b34c26e48f18ab750e42.jpg942w_1332h_progressive.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">11</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3237314.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Attention Is A Talent</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Transformer &amp; Self-Attention</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-21T09:00:10.398Z" title="发表于 2022-11-21 17:00:10">2022-11-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-11-21T09:03:06.787Z" title="更新于 2022-11-21 17:03:06">2022-11-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/NLP/">NLP</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Transformer &amp; Self-Attention"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><a target="_blank" rel="noopener" href="https://jalammar.github.io/illustrated-transformer/">阿三博客地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1pu411o7BE/?spm_id_from=333.999.0.0&vd_source=6997c0a04f6a78d03d30de86e9b949d9">李沐老师 48分钟讲解 encoder-decoder中(KV–Q)的运算</a>: </p>
+<p><strong>KQ相乘就是单个q对所有k的相似度作为attention score(给这个K值多少注意力)，与单个v做加权和(权值来自KQ)</strong></p>
+<p>再通过<strong>注意力分数</strong>与<strong>V向量相乘</strong>，<strong>得到每个V应该多大的缩放</strong>， 进行相加后就得到了最终V应该是什么样子了</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1pu411o7BE/?spm_id_from=333.999.0.0&vd_source=6997c0a04f6a78d03d30de86e9b949d9">李沐老师 56分 对multi-head输出和linear层相较于RNN的讲解</a>：</p>
+<p>词向量经过Attention层抓取全局信息，汇聚之后，在每个点上都有了所需要的信息</p>
+<p>(权重不同，每个输出的向量的重点在不同的position编码位置上)，因此只需要做linear transformation。</p>
+<p><strong>bert中transformer参数计算</strong>:</p>
+<p>embedding: vocab_size&#x3D;30522, max_position_embeddings&#x3D;512, token_type_embeddings&#x3D;2(就进行两句分别标记，多了截断)</p>
+<p>​					（30522+512+2）*768 &#x3D; 23835648 (23M)</p>
+<p>self-attention: 768&#x2F;12 &#x3D; 64 (多头每头分64维度的向量) ，64*768(每个64映射回768)，QKV三个矩阵, </p>
+<p>​						  最后一层 786(64 *12的拼接)-&gt;768的线性变换</p>
+<p>​						(768&#x2F;12 * 768 <em>3 ) * 12 + (768</em>768) &#x3D; 2359296</p>
+<p>​						经过12个transformer</p>
+<p>​						2359296*12 &#x3D; 28311552 (28M)</p>
+<p>feedfoward: 自注意力层之后 分别在 encoder 和 decoder 中有个一个全连接层</p>
+<p>​						维度从 768-&gt;4*768_768-&gt;768</p>
+<p>​						(768*4 * 768 )*2 &#x3D; 4718592</p>
+<p>​						(768*4 * 768 )*2  * 12 &#x3D; 56623104 (56M)</p>
+<p>layernorm: 有伽马和贝塔两个参数，embedding层（768 * 2），12层的self-attention，</p>
+<p>​						768 * 2 + 768 * 2 * 2 * 12 &#x3D; 38400</p>
+<p>总计: 23835648+28311552+56623104+38400 &#x3D; 108808704      				(108M)</p>
+<p>每一层的参数为:  多头注意力的参数 + 拼接线性变换的参数 + feed-forward的参数 + layer-norm的参数</p>
+<p>768 * 768 &#x2F; 12 * 3 * 12 + 768 * 768 + 768 * 3072 * 2 + 768 * 2 * 2 &#x3D; 7080960  (7M)</p>
+<h1 id="Encoder-编码阶段"><a href="#Encoder-编码阶段" class="headerlink" title="Encoder 编码阶段"></a>Encoder 编码阶段</h1><h2 id="Multi-head-Attention"><a href="#Multi-head-Attention" class="headerlink" title="Multi-head Attention"></a>Multi-head Attention</h2><p>多头注意力机制将一个词向量留过八个 self-attention 头生成八个词向量 vector，</p>
+<p>将八个词向量拼接，通过 fc 层进行 softmax 输出。</p>
+<p>例如：</p>
+<p>词向量为 (1,4) –&gt; </p>
+<p>经过 QKV 矩阵(系数) 得到 (1,3) 八个 (1,3)*8 –&gt;</p>
+<p>将输出拼接成 (8,3) 矩阵与全连接层的系数矩阵进行相乘再 softmax <strong>确定最后输出的</strong> 词向量 –&gt;</p>
+<p>(1,4)</p>
+<h3 id="注意-QKV矩阵怎么来的-attention分数-，最后为什么要拼接，以及FC层的系数"><a href="#注意-QKV矩阵怎么来的-attention分数-，最后为什么要拼接，以及FC层的系数" class="headerlink" title="注意 QKV矩阵怎么来的(attention分数)，最后为什么要拼接，以及FC层的系数"></a>注意 QKV矩阵怎么来的(attention分数)，最后为什么要拼接，以及FC层的系数</h3><ol>
+<li><p>qk相乘得到，词向量与其他词的attention分数( q1*(k1,k2,k3) )</p>
+</li>
+<li><p>多头注意力机制让一份词向量产生了多份答案，将每一份注意力机制的产物拼接，</p>
+<p>获得了词向量在不同注意力矩阵运算后的分数，进行拼接后，softmax输出<strong>最注意的词</strong>，即是注意力机制。</p>
+</li>
+<li><p><strong>多头注意力机制，将向量复制n份(n为多头头数)，投影到如512&#x2F;8 &#x3D; 64的64维的低维空间，最后将每一层的输出结果</strong></p>
+<p><strong>此处为八层，8*64&#x3D;512 拼回512维的输出数据</strong></p>
+<p><strong>由于Scale Dot Product 只是做乘法点积(向量变成qvk之后的attention运算)，没什么参数，因此重点学习的参数在Multi-Head的线性变换中，</strong></p>
+<p><strong>即将 64*8的八份数据线性变换的下文中的W0，给模型八次机会希望能够学到什么，最后在拼接回来。</strong>&#x3D;&#x3D;</p>
+</li>
+</ol>
+<p><strong>注意力机制流程</strong>：</p>
+<p><strong>q –&gt; 查询向量</strong></p>
+<p><strong>set( k，v)    		k –&gt;关键字 v—-&gt; 值</strong></p>
+<p><strong>如果 q对k的相似度很高，则输出v的概率也变高</strong></p>
+<img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/self-attention-output.png" alt="img" style="zoom: 80%;" />
+
+<p><strong>’多头’注意力机制</strong> </p>
+<p>请注意并推演其<strong>词向量维度与系数矩阵带的行数</strong></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png" alt="img"></p>
+<h3 id="Scale-Dot-Product"><a href="#Scale-Dot-Product" class="headerlink" title="Scale Dot Product"></a>Scale Dot Product</h3><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/self-attention-matrix-calculation-2.png" alt="img"></p>
+<p><strong>step1</strong></p>
+<p>QK做点积，则输出每一行，是q与所有k的相乘相加结果，</p>
+<p>α1 &#x3D; （q11k11+q12k21+q13k31 ,  q11k12+q12k22+q13k32 )</p>
+<p>α2同理。</p>
+<p><strong>step2</strong></p>
+<p>所以得到了query1对所有key的相似度，最后每一行做个softmax进行概率分布。</p>
+<p>除以根号dk是为了平滑梯度，具体来说：<strong>当概率趋近于1的时候softmax函数的梯度很小</strong>，<strong>除以dk让数值接近函数中部，梯度会比较陡峭</strong></p>
+<p><strong>step3</strong></p>
+<p>将第二步的结果与V相乘得到最后的输出</p>
+<h2 id="Position-Embedding"><a href="#Position-Embedding" class="headerlink" title="Position Embedding"></a>Position Embedding</h2><p>位置编码是 将embedding好的词向量加上 position embedding vector 将<strong>信息融合，在注意力机制中进行计算</strong>。</p>
+<p>(原文是使用sin cos将词向量份两部分进行编码， 本文中将交替使用sin cos，即单数sin 双数cos)</p>
+<p>位置嵌入编码，主要是为了编辑定位<strong>词向量的位置</strong>以及<strong>词向量间的相对距离</strong></p>
+<blockquote>
+<p>pos为 词的种类数，为行标号</p>
+<p>i 为特征维度</p>
+<p>len(pos) * len(i)  表示为一position embedding 矩阵， 每一行为词的位置信息，每一列表示在特征上偏置，</p>
+<p><strong>将位置信息 融入 词向量信息 使词获得 时间上的相对信息</strong></p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.imagehub.cc/image/JqzAac"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/11/09/image638960e7f1096a03.png" alt="image638960e7f1096a03.png" border="0" /></a></p>
+<img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/transformer_positional_encoding_large_example.png" alt="img" style="zoom: 80%;" />
+
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/attention-is-all-you-need-positional-encoding.png" alt="img"></p>
+<h2 id="Residual-细节"><a href="#Residual-细节" class="headerlink" title="Residual 细节"></a>Residual 细节</h2><p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/transformer_resideual_layer_norm_2.png" alt="img"></p>
+<h1 id="Decoder-解码阶段"><a href="#Decoder-解码阶段" class="headerlink" title="Decoder 解码阶段"></a>Decoder 解码阶段</h1><h3 id="Mask-Multi-head"><a href="#Mask-Multi-head" class="headerlink" title="Mask Multi-head"></a>Mask Multi-head</h3><p>与encoder不同的是，解码器在工作时会引入 <strong>Mask Multi-head 机制</strong>，将右侧的词盖住(设为负无穷或者别的)。</p>
+<p>具体来说:</p>
+<ol>
+<li><p><strong>encoder 将生成的K和V矩阵</strong>传入 decoder 的 self-attention 模块中，而 <strong>decoder 将产生 mask 后的Q矩阵</strong>与其做attention。</p>
+</li>
+<li><p>mask做的事情</p>
+<p><a target="_blank" rel="noopener" href="https://www.imagehub.cc/image/JPWaZm"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/10/31/IMG_235920221004-111643.jpg" alt="IMG_235920221004-111643.jpg" border="0" /></a></p>
+</li>
+</ol>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://jalammar.github.io/images/t/transformer_decoding_2.gif" alt="img"></p>
+<p>没太懂，这张图，这里<strong>可以实现并行化嘛</strong>？&#x3D;&#x3D;解释在Mask细节&#x3D;&#x3D;</p>
+<p>按照小蛮的矩阵，右侧的是可以屏蔽的，但是扩展成n为的词向量怎么屏蔽呢？</p>
+<p>在生成z矩阵屏蔽？ 不可能，已经参加计算了。</p>
+<p>所以不能并行输出？ 只能一个一个吐？等下看下小蛮视频、huggingface教程也行</p>
+<p><strong>时间维度</strong> </p>
+<p>在时间序列的情况下，词向量表示为，t1时刻的vector，t2时刻的vector….</p>
+<p>mask做的事情就是将后面(右边)的 tn个时刻都屏蔽掉，</p>
+<p>而Qmatrix的形成 将vector含有了其之后词的信息(共享了系数矩阵)，所以将其右边屏蔽。</p>
+<p>则剔除了后面词的信息，从而不进行考虑。</p>
+<h3 id="Mask-细节"><a href="#Mask-细节" class="headerlink" title="Mask 细节"></a>Mask 细节</h3><p>mask就是为了阻止词知道后面的信息，具体来说就是QKV矩阵还相乘，但是引入-inf来阻止右边(后面的信息汇聚)</p>
+<p><a target="_blank" rel="noopener" href="https://www.imagehub.cc/image/JP7vvk"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/10/31/1a35106e841b162c68e41ceb2d8aafb.jpg" alt="1a35106e841b162c68e41ceb2d8aafb.jpg" border="0" style="zoom:50%;" /></a></p>
+<p>同小蛮的流程，<strong>第一次点积：</strong>将Q和K矩阵相乘得到attention分数，</p>
+<p>将右上角置零就会得到只含有本身信息和相对位置之前(左边)的信息，</p>
+<p>且<strong>第二次点积:</strong> Mask(QK)与V相乘由下三角矩阵的性质，</p>
+<p><a target="_blank" rel="noopener" href="https://www.imagehub.cc/image/JPuD0r"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/10/31/752a1f3305f3573aacc1c7b92395faf.jpg" alt="752a1f3305f3573aacc1c7b92395faf.jpg" border="0" style="zoom:50%;" /></a></p>
+<p>第一行(t1时刻)只考虑第一个值的输出</p>
+<p>第一行(t2时刻)考虑第一个和第二个值的输出</p>
+<p>….</p>
+<p>这样就可以实现 tn时刻只考虑 t1 到 tn-1的输出</p>
+<p>如此便可实现并行化。 (encode到decode还是串行的)</p>
+<img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://z3.ax1x.com/2021/04/20/c7w7rD.png#shadow" alt="img" style="zoom:50%;" />
+
+<p><strong>注: mask去负无穷是因为 SoftMax中 e的指数形式只有在负无穷才为零，</strong></p>
+<p><strong>这样相乘数据不会有一点影响，取其他值，都会影响softmax</strong></p>
+<img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://z3.ax1x.com/2021/04/20/c7w48x.png#shadow" alt="img"  />
+
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.ax1x.com/2020/07/12/U3FCQ0.png#shadow" alt="img"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>特别注意理解 attention机制将词向量之间的联系， <strong>attention分数</strong></li>
+<li>embedding方式为 <strong>词向量+位置编码向量</strong></li>
+<li>引入了 <strong>Residual</strong></li>
+<li><strong>encoder-decoder层的传入</strong>为KV矩阵，decoder生成Q矩阵</li>
+<li><strong>Mask方式</strong></li>
+</ol>
+<h3 id="尚未明晰"><a href="#尚未明晰" class="headerlink" title="尚未明晰:"></a>尚未明晰:</h3><ol>
+<li>multi-head 将输入的向量均分八等分？分别做 self-attention？ 减少参数加快运算，结果还差不多？</li>
+<li>multi-head 处理的向量是在不同维度处理？ 比如 head1是词义，head2是位置等等。</li>
+</ol>
+<p>(来自小蛮视频)</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Poy One</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2022/11/21/NLP%E7%AC%94%E8%AE%B0/Transformer%20Self-Attention/">http://example.com/2022/11/21/NLP%E7%AC%94%E8%AE%B0/Transformer%20Self-Attention/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Attention Is A Talent</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Transformer/">Transformer</a></div><div class="post_share"><div class="social-share" data-image="https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3237314.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/11/21/NLP%E7%AC%94%E8%AE%B0/Attention%E6%9C%BA%E5%88%B6/"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/11/20/280ec98efd2ba3bedc7b448501dfa8b486aae185.jpg942w_1269h_progressive.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Attention机制</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://s1.imagehub.cc/images/2022/11/20/375c6e3994a1f2472da5b34c26e48f18ab750e42.jpg942w_1332h_progressive.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Poy One</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">11</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/poyone"><i></i><span>🛴前往github...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/poyone" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:poyone1222@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Encoder-%E7%BC%96%E7%A0%81%E9%98%B6%E6%AE%B5"><span class="toc-number">1.</span> <span class="toc-text">Encoder 编码阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Multi-head-Attention"><span class="toc-number">1.1.</span> <span class="toc-text">Multi-head Attention</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F-QKV%E7%9F%A9%E9%98%B5%E6%80%8E%E4%B9%88%E6%9D%A5%E7%9A%84-attention%E5%88%86%E6%95%B0-%EF%BC%8C%E6%9C%80%E5%90%8E%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%8B%BC%E6%8E%A5%EF%BC%8C%E4%BB%A5%E5%8F%8AFC%E5%B1%82%E7%9A%84%E7%B3%BB%E6%95%B0"><span class="toc-number">1.1.1.</span> <span class="toc-text">注意 QKV矩阵怎么来的(attention分数)，最后为什么要拼接，以及FC层的系数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Scale-Dot-Product"><span class="toc-number">1.1.2.</span> <span class="toc-text">Scale Dot Product</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Position-Embedding"><span class="toc-number">1.2.</span> <span class="toc-text">Position Embedding</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Residual-%E7%BB%86%E8%8A%82"><span class="toc-number">1.3.</span> <span class="toc-text">Residual 细节</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Decoder-%E8%A7%A3%E7%A0%81%E9%98%B6%E6%AE%B5"><span class="toc-number">2.</span> <span class="toc-text">Decoder 解码阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mask-Multi-head"><span class="toc-number">2.0.1.</span> <span class="toc-text">Mask Multi-head</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mask-%E7%BB%86%E8%8A%82"><span class="toc-number">2.0.2.</span> <span class="toc-text">Mask 细节</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%9A%E6%9C%AA%E6%98%8E%E6%99%B0"><span class="toc-number">3.0.1.</span> <span class="toc-text">尚未明晰:</span></a></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By Poy One</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3306081.jpg);"> <a class="categoryBar-list-link" href="categories/CV/">CV</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">Python</span></li><li class="categoryBar-list-item" style="background:url(https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.600.3414217.jpg);"> <a class="categoryBar-list-link" href="categories/NLP/">NLP</a><span class="categoryBar-list-count">7</span><span class="categoryBar-list-descr">NLP</span></li><li class="categoryBar-list-item" style="background:url(https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3797634.jpg);"> <a class="categoryBar-list-link" href="categories/Trick/">Trick</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">CV</span></li><li class="categoryBar-list-item" style="background:url(https://s1.imagehub.cc/images/2022/11/21/Souryuu.Asuka.Langley.full.3198846.png);"> <a class="categoryBar-list-link" href="categories/HuggingFace/">HuggingFace</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">个人日记</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><!-- hexo injector body_end end --></body></html>
