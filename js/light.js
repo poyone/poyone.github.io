@@ -1,6 +1,6 @@
 // 霓虹灯效果
 // 颜色数组
-var arr = ["#39c5bb", "#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];
+var arr = ["#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];
 // 颜色索引
 var idx = 0;
 
@@ -46,4 +46,4 @@ function changeColor() {
 }
 
 // 开启计时器
-window.onload = setInterval(changeColor, 12000);
+window.onload = setInterval(changeColor, 9900);
