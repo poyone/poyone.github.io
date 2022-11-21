@@ -23,20 +23,20 @@
   }
 
 /* 一级菜单居中 */
-#nav .menus_items {
+/* #nav .menus_items {
     position: absolute !important;
     width: fit-content !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
   }
-  /* 子菜单横向展示 */
-  #nav .menus_items .menus_item:hover .menus_item_child {
+  子菜单横向展示 */
+  /* #nav .menus_items .menus_item:hover .menus_item_child {
     display: flex !important;
   }
   /* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */
-  .menus_items .menus_item:nth-child(2) .menus_item_child {
+  /* .menus_items .menus_item:nth-child(2) .menus_item_child {
     left: -125px;
-  }
+  } */ */
 
 /* 夜间模式菜单栏发光字 */
 [data-theme="dark"] #nav .site-page,
@@ -112,15 +112,22 @@
   }
 
 /* 翻页按钮居中 */
-/* #pagination {
+#pagination {
   width: 100%;
   margin: auto;
-} */
+}
 
 /* 首页 卡片文章背景透明 */
 div#post {
   background: #ffffffee
 }
 [data-theme="dark"] div#post {
-  background: #191919ee
+  background: #191919dd
+}
+
+#aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post {
+  background: #ffffffee
+}
+[data-theme="dark"] #aside_content .card-widget, #recent-posts>.recent-post-item, .layout_page>div:first-child:not(.recent-posts), .layout_post>#page, .layout_post>#post, .read-mode .layout_post>#post {
+  background: #191919dd
 }
