@@ -123,6 +123,17 @@
     
     <entry>
       <title></title>
+      <link href="/archives/index.html"/>
+      <url>/archives/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
       
@@ -134,8 +145,8 @@
     
     <entry>
       <title></title>
-      <link href="/archives/index.html"/>
-      <url>/archives/index.html</url>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -147,17 +158,6 @@
       <title>categories</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
