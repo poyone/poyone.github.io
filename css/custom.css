@@ -120,14 +120,14 @@
 
 /* 首页 卡片文章背景透明 */
 #recent-posts>.recent-post-item {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border-radius: 25px;
   border: 1px solid rgb(169, 169, 169) 
 }
 
 #aside-content .card-widget {
-  background: var(#191919dd);
+  background: #ffffffdd; 
   /* backdrop-filter: var(--backdrop-filter); */
   border-radius: 18px;
   transition: .3s;
@@ -135,35 +135,35 @@
 }
 
 div#post {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border: 1px solid rgb(169, 169, 169) ;
   border-radius: 20px
 }
 
 div#page {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border: 1px solid rgb(169, 169, 169) ;
   border-radius: 20px
 }
 
 div#archive {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border: 1px solid rgb(169, 169, 169) ;
   border-radius: 20px
 }
 
 div#tag {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border: 1px solid rgb(169, 169, 169) ;
   border-radius: 20px
 }
 
 div#category {
-  background: var(#191919dd);
+  background: #ffffffdd;
   /* backdrop-filter: var(--backdrop-filter); */
   border: 1px solid rgb(169, 169, 169) ;
   border-radius: 20px
@@ -179,31 +179,31 @@ div#category {
 }
 
 [data-theme=dark] #recent-posts>.recent-post-item {
-  background: var(-#191919dd)
+  background: #191919dd  
 }
 
 [data-theme=dark] #aside-content .card-widget {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] div#post {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] div#tag {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] div#archive {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] div#page {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] div#category {
-  background: var(-#191919dd)
+  background: #191919dd
 }
 
 [data-theme=dark] #footer::before {
@@ -230,4 +230,9 @@ div#category {
 [data-theme=dark] .read-mode div#post {
   background: rgba(25,25,25,.9)!important;
   color: #fff
+}
+
+/* 隐藏分类磁贴数字 */
+span.categoryBar-list-count {
+  display: none !important;
 }
