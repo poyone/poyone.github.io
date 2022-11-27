@@ -263,9 +263,9 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title></title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -285,9 +285,9 @@
     
     
     <entry>
-      <title></title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -297,10 +297,10 @@
     
     <entry>
       <title></title>
-      <link href="/js/light.js"/>
-      <url>/js/light.js</url>
+      <link href="/css/categorybar.css"/>
+      <url>/css/categorybar.css</url>
       
-        <content type="html"><![CDATA[// 霓虹灯效果// 颜色数组var arr = ["#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];// 颜色索引var idx = 0;// 切换颜色function changeColor() {    // 仅夜间模式才启用    if (document.getElementsByTagName('html')[0].getAttribute('data-theme') == 'dark') {        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = arr[idx] + " 0 0 10px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = arr[idx] + " 0 0 5px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = arr[idx] + " 0 0 12px";            document.getElementsByClassName("author-info__description")[0].style.textShadow = arr[idx] + " 0 0 12px";        } catch {                    }        idx++;        if (idx == 8) {            idx = 0;        }    } else {        // 白天模式恢复默认        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = "#1e1e1ee0 1px 1px 1px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = "";            document.getElementsByClassName("author-info__description")[0].style.textShadow = "";        } catch {                    }    }}// 开启计时器window.onload = setInterval(changeColor, 9900);]]></content>
+        <content type="html"><![CDATA[#categoryBar {  width: 100% !important;}ul.categoryBar-list {  margin: 5px 5px 0 5px !important;  padding: 0 !important;}li.categoryBar-list-item {  font-weight: bold;  display: inline-block;  height: 180px !important;  margin: 5px 0.5% 0 0.5% !important;  background-image: linear-gradient(rgba(0,0,0,0.4) 25%, rgba(16,16,16,0) 100%);  border-radius: 10px;  padding: 25px 0 25px 25px !important;  box-shadow: rgba(50,50,50,0.3) 50px 50px 50px 50px inset;  overflow: hidden;  background-size: 100% !important;  background-position: center !important;}li.categoryBar-list-item:hover {  background-size: 110% !important;  box-shadow: inset 500px 50px 50px 50px rgba(50,50,50,0.6);}li.categoryBar-list-item:hover span.categoryBar-list-descr {  transition: all 0.5s;  transform: translate(-100%, 0);}a.categoryBar-list-link {  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link::before {  content: '|' !important;  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link:after {  content: '';  position: relative;  width: 0;  bottom: 0;  display: block;  height: 3px;  border-radius: 3px;  background-color: #fff;}a.categoryBar-list-link:hover:after {  width: 90%;  left: 1%;  transition: all 0.5s;}span.categoryBar-list-count {  /* display: block !important; */  color: #fff !important;  font-size: 20px !important;}span.categoryBar-list-count::before {  content: '\f02d' !important;  padding-right: 15px !important;  display: inline-block;  font-weight: 600;  font-style: normal;  font-variant: normal;  font-family: 'Font Awesome 6 Free';  text-rendering: auto;  -webkit-font-smoothing: antialiased;}span.categoryBar-list-descr {  padding: 5px;  display: block !important;  color: #fff !important;  font-size: 20px !important;  position: relative;  right: -100%;}@media screen and (max-width: 650px) {  li.categoryBar-list-item {    width: 48% !important;    height: 150px !important;    margin: 5px 1% 0 1% !important;  }}]]></content>
       
     </entry>
     
@@ -319,10 +319,10 @@
     
     <entry>
       <title></title>
-      <link href="/css/categorybar.css"/>
-      <url>/css/categorybar.css</url>
+      <link href="/js/light.js"/>
+      <url>/js/light.js</url>
       
-        <content type="html"><![CDATA[#categoryBar {  width: 100% !important;}ul.categoryBar-list {  margin: 5px 5px 0 5px !important;  padding: 0 !important;}li.categoryBar-list-item {  font-weight: bold;  display: inline-block;  height: 180px !important;  margin: 5px 0.5% 0 0.5% !important;  background-image: linear-gradient(rgba(0,0,0,0.4) 25%, rgba(16,16,16,0) 100%);  border-radius: 10px;  padding: 25px 0 25px 25px !important;  box-shadow: rgba(50,50,50,0.3) 50px 50px 50px 50px inset;  overflow: hidden;  background-size: 100% !important;  background-position: center !important;}li.categoryBar-list-item:hover {  background-size: 110% !important;  box-shadow: inset 500px 50px 50px 50px rgba(50,50,50,0.6);}li.categoryBar-list-item:hover span.categoryBar-list-descr {  transition: all 0.5s;  transform: translate(-100%, 0);}a.categoryBar-list-link {  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link::before {  content: '|' !important;  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link:after {  content: '';  position: relative;  width: 0;  bottom: 0;  display: block;  height: 3px;  border-radius: 3px;  background-color: #fff;}a.categoryBar-list-link:hover:after {  width: 90%;  left: 1%;  transition: all 0.5s;}span.categoryBar-list-count {  /* display: block !important; */  color: #fff !important;  font-size: 20px !important;}span.categoryBar-list-count::before {  content: '\f02d' !important;  padding-right: 15px !important;  display: inline-block;  font-weight: 600;  font-style: normal;  font-variant: normal;  font-family: 'Font Awesome 6 Free';  text-rendering: auto;  -webkit-font-smoothing: antialiased;}span.categoryBar-list-descr {  padding: 5px;  display: block !important;  color: #fff !important;  font-size: 20px !important;  position: relative;  right: -100%;}@media screen and (max-width: 650px) {  li.categoryBar-list-item {    width: 48% !important;    height: 150px !important;    margin: 5px 1% 0 1% !important;  }}]]></content>
+        <content type="html"><![CDATA[// 霓虹灯效果// 颜色数组var arr = ["#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];// 颜色索引var idx = 0;// 切换颜色function changeColor() {    // 仅夜间模式才启用    if (document.getElementsByTagName('html')[0].getAttribute('data-theme') == 'dark') {        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = arr[idx] + " 0 0 10px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = arr[idx] + " 0 0 5px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = arr[idx] + " 0 0 12px";            document.getElementsByClassName("author-info__description")[0].style.textShadow = arr[idx] + " 0 0 12px";        } catch {                    }        idx++;        if (idx == 8) {            idx = 0;        }    } else {        // 白天模式恢复默认        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = "#1e1e1ee0 1px 1px 1px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = "";            document.getElementsByClassName("author-info__description")[0].style.textShadow = "";        } catch {                    }    }}// 开启计时器window.onload = setInterval(changeColor, 9900);]]></content>
       
     </entry>
     
