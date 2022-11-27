@@ -4,19 +4,6 @@
   
     
     <entry>
-      <title></title>
-      <link href="/posts/1.html"/>
-      <url>/posts/1.html</url>
-      
-        <content type="html"><![CDATA[<p>Zero To Transformers &amp; BERT</p><h1 id="AUC"><a href="#AUC" class="headerlink" title="AUC"></a>AUC</h1><p>AUC是 ROC曲线下面的面积</p><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> preprocessing, decomposition, model_selection, metrics, pipeline</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">roc_auc</span>(<span class="params">predictions,target</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    This methods returns the AUC Score when given the Predictions</span></span><br><span class="line"><span class="string">    and Labels</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    </span><br><span class="line">    fpr, tpr, thresholds = metrics.roc_curve(target, predictions)</span><br><span class="line">    roc_auc = metrics.auc(fpr, tpr)</span><br><span class="line">    <span class="keyword">return</span> roc_auc</span><br><span class="line"></span><br></pre></td></tr></table></figure><h1 id="EOS-BOS"><a href="#EOS-BOS" class="headerlink" title="EOS BOS"></a>EOS BOS</h1><p>由于答案的生成可能有多个句子，单单把句号指定为EOS并不能为我们生成一段话作为答案，</p><h1 id="LSTM’s-Shape"><a href="#LSTM’s-Shape" class="headerlink" title="LSTM’s  Shape"></a>LSTM’s  Shape</h1><p>(batch_size, time_steps, un) 这里换到nlp章节，图片换成本地图片，attention机制里面的图片转一下</p><p><img src="https://miro.medium.com/max/665/1*AQKRJsRdWx2HZ85H1yWoKw.png" alt="img"></p><h1 id="embedding层在干嘛-没看懂"><a href="#embedding层在干嘛-没看懂" class="headerlink" title="embedding层在干嘛 没看懂"></a>embedding层在干嘛 没看懂</h1><h1 id="GloVe-amp-word2vec"><a href="#GloVe-amp-word2vec" class="headerlink" title="GloVe &amp; word2vec"></a>GloVe &amp; word2vec</h1><p>两个模型都可以根据词汇的“共现co-occurrence”信息，将词汇编码成一个向量（所谓共现，即语料中词汇一块出现的频率）。 两者最直观的区别在于，</p><p>word2vec是“predictive”的模型，</p><p>GloVe是“count-based”的模型。</p><p>CBOW是根据附近词义生成目标词汇的向量</p><p>skip-gram是根据本词，预测周围词</p><h1 id="GRU"><a href="#GRU" class="headerlink" title="GRU"></a>GRU</h1><p>是LSTM的一种变体，有时候比lstm好用，快，结果更好，不知道啥时候</p><h1 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h1><p>还介绍了很多种 attention的变体，垃圾玩意，</p><p>不如我直接 把 自己基于矩阵计算的transform再写一遍</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>Pipeline 句意相似度</title>
       <link href="/posts/10656.html"/>
       <url>/posts/10656.html</url>
@@ -264,6 +251,17 @@
     
     <entry>
       <title></title>
+      <link href="/archives/index.html"/>
+      <url>/archives/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
       
@@ -275,21 +273,10 @@
     
     <entry>
       <title></title>
-      <link href="/archives/index.html"/>
-      <url>/archives/index.html</url>
+      <link href="/js/light.js"/>
+      <url>/js/light.js</url>
       
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[// 霓虹灯效果// 颜色数组var arr = ["#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];// 颜色索引var idx = 0;// 切换颜色function changeColor() {    // 仅夜间模式才启用    if (document.getElementsByTagName('html')[0].getAttribute('data-theme') == 'dark') {        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = arr[idx] + " 0 0 10px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = arr[idx] + " 0 0 5px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = arr[idx] + " 0 0 12px";            document.getElementsByClassName("author-info__description")[0].style.textShadow = arr[idx] + " 0 0 12px";        } catch {                    }        idx++;        if (idx == 8) {            idx = 0;        }    } else {        // 白天模式恢复默认        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = "#1e1e1ee0 1px 1px 1px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = "";            document.getElementsByClassName("author-info__description")[0].style.textShadow = "";        } catch {                    }    }}// 开启计时器window.onload = setInterval(changeColor, 9900);]]></content>
       
     </entry>
     
@@ -301,28 +288,6 @@
       <url>/css/categorybar.css</url>
       
         <content type="html"><![CDATA[#categoryBar {  width: 100% !important;}ul.categoryBar-list {  margin: 5px 5px 0 5px !important;  padding: 0 !important;}li.categoryBar-list-item {  font-weight: bold;  display: inline-block;  height: 180px !important;  margin: 5px 0.5% 0 0.5% !important;  background-image: linear-gradient(rgba(0,0,0,0.4) 25%, rgba(16,16,16,0) 100%);  border-radius: 10px;  padding: 25px 0 25px 25px !important;  box-shadow: rgba(50,50,50,0.3) 50px 50px 50px 50px inset;  overflow: hidden;  background-size: 100% !important;  background-position: center !important;}li.categoryBar-list-item:hover {  background-size: 110% !important;  box-shadow: inset 500px 50px 50px 50px rgba(50,50,50,0.6);}li.categoryBar-list-item:hover span.categoryBar-list-descr {  transition: all 0.5s;  transform: translate(-100%, 0);}a.categoryBar-list-link {  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link::before {  content: '|' !important;  color: #fff !important;  font-size: 20px !important;}a.categoryBar-list-link:after {  content: '';  position: relative;  width: 0;  bottom: 0;  display: block;  height: 3px;  border-radius: 3px;  background-color: #fff;}a.categoryBar-list-link:hover:after {  width: 90%;  left: 1%;  transition: all 0.5s;}span.categoryBar-list-count {  /* display: block !important; */  color: #fff !important;  font-size: 20px !important;}span.categoryBar-list-count::before {  content: '\f02d' !important;  padding-right: 15px !important;  display: inline-block;  font-weight: 600;  font-style: normal;  font-variant: normal;  font-family: 'Font Awesome 6 Free';  text-rendering: auto;  -webkit-font-smoothing: antialiased;}span.categoryBar-list-descr {  padding: 5px;  display: block !important;  color: #fff !important;  font-size: 20px !important;  position: relative;  right: -100%;}@media screen and (max-width: 650px) {  li.categoryBar-list-item {    width: 48% !important;    height: 150px !important;    margin: 5px 1% 0 1% !important;  }}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;  }  #page-header {    background: transparent !important;  }    /* 白天模式遮罩透明 */  #footer::before {    background: transparent !important;  }  /* #page-header::before {    background: transparent !important;  } */    /* 夜间模式遮罩透明 */  [data-theme="dark"] #footer::before {    background: transparent !important;  }  [data-theme="dark"] #page-header::before {    background: transparent !important;  }/* 一级菜单居中 *//* #nav .menus_items {    position: absolute !important;    width: fit-content !important;    left: 50% !important;    transform: translateX(-50%) !important;  }  子菜单横向展示 */  /* #nav .menus_items .menus_item:hover .menus_item_child {    display: flex !important;  }  /* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */  /* .menus_items .menus_item:nth-child(2) .menus_item_child {    left: -125px;  } */ *//* 夜间模式菜单栏发光字 */[data-theme="dark"] #nav .site-page,[data-theme="dark"] #nav .menus_items .menus_item .menus_item_child li a {  text-shadow: 0 0 2px var(--theme-color) !important;}/* 手机端适配 */[data-theme="dark"] #sidebar #sidebar-menus .menus_items .site-page {  text-shadow: 0 0 2px var(--theme-color) !important;}/* 侧边栏个人信息卡片动态渐变色 *//* #aside-content > .card-widget.card-info {   background-image: linear-gradient(  to right,   #ff8177 0%,  #ff867a 0%,  #ff8c7f 21%,  #f99185 52%,  #cf556c 78%,  #b12a5b 100%);;    box-shadow: 0 0 5px rgb(66, 68, 68);    position: relative;    background-size: 400% 400%;    -webkit-animation: Gradient 10s ease infinite;    -moz-animation: Gradient 10s ease infinite;    animation: Gradient 10s ease infinite !important;  }  @-webkit-keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }  @-moz-keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }  @keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }      /* 黑夜模式适配 */  [data-theme="dark"] #aside-content > .card-widget.card-info {    background: #191919dd;  }    /* 个人信息Follow me按钮 */  #aside-content > .card-widget.card-info > #card-info-btn {    background-color: #3eb8be;    border-radius: 8px;  }/* 翻页按钮居中 */#pagination {  width: 100%;  margin: auto;}/* 首页 卡片文章背景透明 */#recent-posts>.recent-post-item {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border-radius: 25px;  border: 1px solid rgb(169, 169, 169) }#aside-content .card-widget {  background: #ffffffee;   /* backdrop-filter: var(--backdrop-filter); */  border-radius: 18px;  transition: .3s;  border: 1px solid rgb(169, 169, 169) }div#post {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#page {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#archive {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#tag {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#category {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}#page-header.nav-fixed #nav {  background: rgba(255,255,255,.75);  /* backdrop-filter: var(--backdrop-filter) */}[data-theme=dark] #page-header.nav-fixed #nav {  background: rgba(0,0,0,.7)!important}[data-theme=dark] #recent-posts>.recent-post-item {  background: #191919dd  }[data-theme=dark] #aside-content .card-widget {  background: #191919dd}[data-theme=dark] div#post {  background: #191919dd}[data-theme=dark] div#tag {  background: #191919dd}[data-theme=dark] div#archive {  background: #191919dd}[data-theme=dark] div#page {  background: #191919dd}[data-theme=dark] div#category {  background: #191919dd}[data-theme=dark] #footer::before {  background: 0 0!important}[data-theme=dark] #page-header::before {  background: 0 0!important}.read-mode #aside-content .card-widget {  background: rgba(158,204,171,.5)!important}.read-mode div#post {  background: rgba(158,204,171,.5)!important}[data-theme=dark] .read-mode #aside-content .card-widget {  background: rgba(25,25,25,.9)!important;  color: #fff}[data-theme=dark] .read-mode div#post {  background: rgba(25,25,25,.9)!important;  color: #fff}/* 隐藏分类磁贴数字 */span.categoryBar-list-count {  display: none !important;}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/light.js"/>
-      <url>/js/light.js</url>
-      
-        <content type="html"><![CDATA[// 霓虹灯效果// 颜色数组var arr = ["#f14747", "#f1a247", "#f1ee47", "#b347f1", "#1edbff", "#ed709b", "#5636ed"];// 颜色索引var idx = 0;// 切换颜色function changeColor() {    // 仅夜间模式才启用    if (document.getElementsByTagName('html')[0].getAttribute('data-theme') == 'dark') {        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = arr[idx] + " 0 0 15px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = arr[idx] + " 0 0 10px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = arr[idx] + " 0 0 5px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = arr[idx] + " 0 0 12px";            document.getElementsByClassName("author-info__description")[0].style.textShadow = arr[idx] + " 0 0 12px";        } catch {                    }        idx++;        if (idx == 8) {            idx = 0;        }    } else {        // 白天模式恢复默认        if (document.getElementById("site-name"))            document.getElementById("site-name").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-title"))            document.getElementById("site-title").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("site-subtitle"))            document.getElementById("site-subtitle").style.textShadow = "#1e1e1ee0 1px 1px 1px";        if (document.getElementById("post-info"))            document.getElementById("post-info").style.textShadow = "#1e1e1ee0 1px 1px 1px";        try {            document.getElementsByClassName("author-info__name")[0].style.textShadow = "";            document.getElementsByClassName("author-info__description")[0].style.textShadow = "";        } catch {                    }    }}// 开启计时器window.onload = setInterval(changeColor, 9900);]]></content>
       
     </entry>
     
@@ -343,6 +308,28 @@
       <title>知识标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 页脚与头图透明 */#footer {    background: transparent !important;  }  #page-header {    background: transparent !important;  }    /* 白天模式遮罩透明 */  #footer::before {    background: transparent !important;  }  /* #page-header::before {    background: transparent !important;  } */    /* 夜间模式遮罩透明 */  [data-theme="dark"] #footer::before {    background: transparent !important;  }  [data-theme="dark"] #page-header::before {    background: transparent !important;  }/* 一级菜单居中 *//* #nav .menus_items {    position: absolute !important;    width: fit-content !important;    left: 50% !important;    transform: translateX(-50%) !important;  }  子菜单横向展示 */  /* #nav .menus_items .menus_item:hover .menus_item_child {    display: flex !important;  }  /* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */  /* .menus_items .menus_item:nth-child(2) .menus_item_child {    left: -125px;  } */ *//* 夜间模式菜单栏发光字 */[data-theme="dark"] #nav .site-page,[data-theme="dark"] #nav .menus_items .menus_item .menus_item_child li a {  text-shadow: 0 0 2px var(--theme-color) !important;}/* 手机端适配 */[data-theme="dark"] #sidebar #sidebar-menus .menus_items .site-page {  text-shadow: 0 0 2px var(--theme-color) !important;}/* 侧边栏个人信息卡片动态渐变色 *//* #aside-content > .card-widget.card-info {   background-image: linear-gradient(  to right,   #ff8177 0%,  #ff867a 0%,  #ff8c7f 21%,  #f99185 52%,  #cf556c 78%,  #b12a5b 100%);;    box-shadow: 0 0 5px rgb(66, 68, 68);    position: relative;    background-size: 400% 400%;    -webkit-animation: Gradient 10s ease infinite;    -moz-animation: Gradient 10s ease infinite;    animation: Gradient 10s ease infinite !important;  }  @-webkit-keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }  @-moz-keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }  @keyframes Gradient {    0% {      background-position: 0% 50%;    }    50% {      background-position: 100% 50%;    }    100% {      background-position: 0% 50%;    }  }      /* 黑夜模式适配 */  [data-theme="dark"] #aside-content > .card-widget.card-info {    background: #191919dd;  }    /* 个人信息Follow me按钮 */  #aside-content > .card-widget.card-info > #card-info-btn {    background-color: #3eb8be;    border-radius: 8px;  }/* 翻页按钮居中 */#pagination {  width: 100%;  margin: auto;}/* 首页 卡片文章背景透明 */#recent-posts>.recent-post-item {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border-radius: 25px;  border: 1px solid rgb(169, 169, 169) }#aside-content .card-widget {  background: #ffffffee;   /* backdrop-filter: var(--backdrop-filter); */  border-radius: 18px;  transition: .3s;  border: 1px solid rgb(169, 169, 169) }div#post {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#page {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#archive {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#tag {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}div#category {  background: #ffffffee;  /* backdrop-filter: var(--backdrop-filter); */  border: 1px solid rgb(169, 169, 169) ;  border-radius: 20px}#page-header.nav-fixed #nav {  background: rgba(255,255,255,.75);  /* backdrop-filter: var(--backdrop-filter) */}[data-theme=dark] #page-header.nav-fixed #nav {  background: rgba(0,0,0,.7)!important}[data-theme=dark] #recent-posts>.recent-post-item {  background: #191919dd  }[data-theme=dark] #aside-content .card-widget {  background: #191919dd}[data-theme=dark] div#post {  background: #191919dd}[data-theme=dark] div#tag {  background: #191919dd}[data-theme=dark] div#archive {  background: #191919dd}[data-theme=dark] div#page {  background: #191919dd}[data-theme=dark] div#category {  background: #191919dd}[data-theme=dark] #footer::before {  background: 0 0!important}[data-theme=dark] #page-header::before {  background: 0 0!important}.read-mode #aside-content .card-widget {  background: rgba(158,204,171,.5)!important}.read-mode div#post {  background: rgba(158,204,171,.5)!important}[data-theme=dark] .read-mode #aside-content .card-widget {  background: rgba(25,25,25,.9)!important;  color: #fff}[data-theme=dark] .read-mode div#post {  background: rgba(25,25,25,.9)!important;  color: #fff}/* 隐藏分类磁贴数字 */span.categoryBar-list-count {  display: none !important;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
