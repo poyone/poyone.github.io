@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title></title>
+      <link href="/posts/1.html"/>
+      <url>/posts/1.html</url>
+      
+        <content type="html"><![CDATA[<p>Zero To Transformers &amp; BERT</p><h1 id="AUC"><a href="#AUC" class="headerlink" title="AUC"></a>AUC</h1><p>AUC是 ROC曲线下面的面积</p><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> preprocessing, decomposition, model_selection, metrics, pipeline</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">roc_auc</span>(<span class="params">predictions,target</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    This methods returns the AUC Score when given the Predictions</span></span><br><span class="line"><span class="string">    and Labels</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    </span><br><span class="line">    fpr, tpr, thresholds = metrics.roc_curve(target, predictions)</span><br><span class="line">    roc_auc = metrics.auc(fpr, tpr)</span><br><span class="line">    <span class="keyword">return</span> roc_auc</span><br><span class="line"></span><br></pre></td></tr></table></figure><h1 id="EOS-BOS"><a href="#EOS-BOS" class="headerlink" title="EOS BOS"></a>EOS BOS</h1><p>由于答案的生成可能有多个句子，单单把句号指定为EOS并不能为我们生成一段话作为答案，</p><h1 id="LSTM’s-Shape"><a href="#LSTM’s-Shape" class="headerlink" title="LSTM’s  Shape"></a>LSTM’s  Shape</h1><p>(batch_size, time_steps, un) 这里换到nlp章节，图片换成本地图片，attention机制里面的图片转一下</p><p><img src="https://miro.medium.com/max/665/1*AQKRJsRdWx2HZ85H1yWoKw.png" alt="img"></p><h1 id="embedding层在干嘛-没看懂"><a href="#embedding层在干嘛-没看懂" class="headerlink" title="embedding层在干嘛 没看懂"></a>embedding层在干嘛 没看懂</h1><h1 id="GloVe-amp-word2vec"><a href="#GloVe-amp-word2vec" class="headerlink" title="GloVe &amp; word2vec"></a>GloVe &amp; word2vec</h1><p>两个模型都可以根据词汇的“共现co-occurrence”信息，将词汇编码成一个向量（所谓共现，即语料中词汇一块出现的频率）。 两者最直观的区别在于，</p><p>word2vec是“predictive”的模型，</p><p>GloVe是“count-based”的模型。</p><p>CBOW是根据附近词义生成目标词汇的向量</p><p>skip-gram是根据本词，预测周围词</p><h1 id="GRU"><a href="#GRU" class="headerlink" title="GRU"></a>GRU</h1><p>是LSTM的一种变体，有时候比lstm好用，快，结果更好，不知道啥时候</p><h1 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h1><p>还介绍了很多种 attention的变体，垃圾玩意，</p><p>不如我直接 把 自己基于矩阵计算的transform再写一遍</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Pipeline 句意相似度</title>
       <link href="/posts/10656.html"/>
       <url>/posts/10656.html</url>
