@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>huggingface proxy</title>
+      <link href="/posts/35234.html"/>
+      <url>/posts/35234.html</url>
+      
+        <content type="html"><![CDATA[<h1 id="huggingface"><a href="#huggingface" class="headerlink" title="huggingface"></a>huggingface</h1><p>在有代理的情况下</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoModelForSeq2SeqLM, AutoTokenizer</span><br><span class="line"></span><br><span class="line">prx = &#123;&#x27;https&#x27;: &#x27;http://127.0.0.1:7890&#x27;&#125;</span><br><span class="line">model_name = &quot;Helsinki-NLP/opus-mt-zh-en&quot;</span><br><span class="line">save_path = r&#x27;D:\00mydataset\huggingface model&#x27;</span><br><span class="line"></span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(model_name, proxies=prx, cache_dir=save_path)</span><br></pre></td></tr></table></figure><p>直接设置代理就可以接到huggingface了</p><h1 id="vscode"><a href="#vscode" class="headerlink" title="vscode"></a>vscode</h1><p>在setting里面的proxy的第一栏设置<code>http://127.0.0.1:7890</code> 后面的7890就是你的端口号，在你的代理处可以查看</p><h1 id="pip"><a href="#pip" class="headerlink" title="pip"></a>pip</h1><p>pip 我根据<a href="https://www.cnblogs.com/bonheur/p/12306108.html">这篇文章</a>在终端直接设置 <code>set http_proxy=&#39;http://127.0.0.1:7890&#39;</code> 这就好了</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 在pip目录创建并编辑pip.ini（配置文件不存在时）</span><br><span class="line">cd C:\Users\(你的用户名)   </span><br><span class="line">mkdir pip                # 创建pip文件夹</span><br><span class="line">cd pip                     # 进入pip路径目录下</span><br><span class="line">cd.&gt;pip.ini              # 创建pip.ini文件</span><br><span class="line"></span><br><span class="line"># 然后打开C:\Users(用户名)\pip\pip.ini，添加如下内容：</span><br><span class="line">[global]</span><br><span class="line">proxy=http://10.20.217.2:8080</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> HuggingFace </tag>
+            
+            <tag> Proxy </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>03 HuggingFace Tokenizer 详解</title>
       <link href="/posts/36291.html"/>
       <url>/posts/36291.html</url>
@@ -432,6 +453,17 @@
       <title>文章分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>资源分享</title>
+      <link href="/something/index.html"/>
+      <url>/something/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
