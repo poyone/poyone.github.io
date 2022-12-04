@@ -1,0 +1,391 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>NLP Baseline 01 翻译 | Attention Is A Talent</title><meta name="author" content="Poy One"><meta name="copyright" content="Poy One"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="从头训练，不如fine-tune，如果你比Google &amp; Mate 有钱当我没说  待完成 Accelarator get_scheduler custom_wandb  Translation这里我们使用zh-en的数据集和模型，进行翻译任务 示例查看123456789101112131415161718192021from transformers import AutoModel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP Baseline 01 翻译">
+<meta property="og:url" content="https://poyone.github.io/posts/58033.html">
+<meta property="og:site_name" content="Attention Is A Talent">
+<meta property="og:description" content="从头训练，不如fine-tune，如果你比Google &amp; Mate 有钱当我没说  待完成 Accelarator get_scheduler custom_wandb  Translation这里我们使用zh-en的数据集和模型，进行翻译任务 示例查看123456789101112131415161718192021from transformers import AutoModel">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp">
+<meta property="article:published_time" content="2022-12-04T16:10:48.719Z">
+<meta property="article:modified_time" content="2022-12-04T16:48:21.828Z">
+<meta property="article:author" content="Poy One">
+<meta property="article:tag" content="Huggingface">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp"><link rel="shortcut icon" href="https://npm.elemecdn.com/poyone1222/eris/eris11.webp"><link rel="canonical" href="https://poyone.github.io/posts/58033"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'NLP Baseline 01 翻译',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-05 00:48:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Attention Is A Talent</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">NLP Baseline 01 翻译</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-04T16:10:48.719Z" title="发表于 2022-12-05 00:10:48">2022-12-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-04T16:48:21.828Z" title="更新于 2022-12-05 00:48:21">2022-12-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/NLP/">NLP</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>14分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="NLP Baseline 01 翻译"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>从头训练，不如fine-tune，如果你比Google &amp; Mate 有钱当我没说</p>
+</blockquote>
+<h1 id="待完成"><a href="#待完成" class="headerlink" title="待完成"></a>待完成</h1><ul>
+<li>Accelarator</li>
+<li>get_scheduler</li>
+<li>custom_wandb</li>
+</ul>
+<h1 id="Translation"><a href="#Translation" class="headerlink" title="Translation"></a>Translation</h1><p>这里我们使用zh-en的数据集和模型，进行翻译任务</p>
+<h1 id="示例查看"><a href="#示例查看" class="headerlink" title="示例查看"></a>示例查看</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoModelForSeq2SeqLM, AutoTokenizer</span><br><span class="line">from datasets import load_dataset</span><br><span class="line"></span><br><span class="line">prx = &#123;&#x27;https&#x27;: &#x27;http://127.0.0.1:7890&#x27;&#125;</span><br><span class="line">model_name = &quot;Helsinki-NLP/opus-mt-zh-en&quot;</span><br><span class="line">save_path = r&#x27;D:\00mydataset\huggingface model&#x27;</span><br><span class="line">data_path = r&#x27;D:\00mydataset\huggingface dataset&#x27;</span><br><span class="line"></span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(model_name, proxies=prx, cache_dir=save_path)</span><br><span class="line">model = AutoModelForSeq2SeqLM.from_pretrained(model_name, proxies=prx, cache_dir=save_path)</span><br><span class="line"></span><br><span class="line">dataset = load_dataset(&#x27;news_commentary&#x27;,&#x27;en-zh&#x27;,cache_dir=data_path)</span><br><span class="line">dataset</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">DatasetDict(&#123;</span><br><span class="line">    train: Dataset(&#123;</span><br><span class="line">        features: [&#x27;id&#x27;, &#x27;translation&#x27;],</span><br><span class="line">        num_rows: 69206</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)&#x27;&#x27;&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个挂个代理加速下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">tokenizer</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">PreTrainedTokenizer(name_or_path=&#x27;Helsinki-NLP/opus-mt-zh-en&#x27;, vocab_size=65001, model_max_len=512, is_fast=False, padding_side=&#x27;right&#x27;, truncation_side=&#x27;right&#x27;, special_tokens=&#123;&#x27;eos_token&#x27;: &#x27;&lt;/s&gt;&#x27;, &#x27;unk_token&#x27;: &#x27;&lt;unk&gt;&#x27;, &#x27;pad_token&#x27;: &#x27;&lt;pad&gt;&#x27;&#125;)</span><br><span class="line">&#x27;&#x27;&#x27;&#x27;</span><br><span class="line">dataset[&#x27;train&#x27;][1][&#x27;translation&#x27;]</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;id&#x27;: &#x27;1&#x27;,</span><br><span class="line"> &#x27;translation&#x27;: &#123;&#x27;en&#x27;: &#x27;PARIS – As the economic crisis deepens and widens, the world has been searching for historical analogies to help us understand what has been happening. At the start of the crisis, many people likened it to 1982 or 1973, which was reassuring, because both dates refer to classical cyclical downturns.&#x27;,</span><br><span class="line">  &#x27;zh&#x27;: &#x27;巴黎-随着经济危机不断加深和蔓延，整个世界一直在寻找历史上的类似事件希望有助于我们了解目前正在发生的情况。一开始，很多人把这次危机比作1982年或1973年所发生的情况，这样得类比是令人宽心的，因为这两段时期意味着典型的周期性衰退。&#x27;&#125;&#125;</span><br><span class="line">  &#x27;&#x27;&#x27;</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+<p>查看下数据, 可以看到返回的是字典形式，我们主要用到translation下的en、zh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">s1 = &#x27;天下第一美少女, 罢了&#x27;</span><br><span class="line">inputs = tokenizer(s1, return_tensors=&#x27;pt&#x27;,)</span><br><span class="line">inputs</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">(&#123;&#x27;input_ids&#x27;: tensor([[ 9705,   359,  3615,  2797, 14889,     2,     7, 40798,     0]]), &#x27;attention_mask&#x27;: tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1]])&#125;,)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">outputs = model.generate(**inputs)</span><br><span class="line">tokenizer.batch_decode(outputs, skip_special_tokens=True)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&quot;The most beautiful girl in the world, that&#x27;s all.&quot;]</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>看下输出，还可以</p>
+<blockquote>
+<p>注意，AutoModelForSeq2SeqLM不同于AutoModel的就是加入了<code>model.generate</code>这个特性。</p>
+<p>不然model(**inputs)是要你补充目标语言的。</p>
+</blockquote>
+<blockquote>
+<p>If you are using a multilingual tokenizer such as mBART, mBART-50, or M2M100, you will need to set the language codes of your inputs and targets in the tokenizer by setting <code>tokenizer.src_lang</code> and <code>tokenizer.tgt_lang</code> to the right values.</p>
+<ul>
+<li>​	如果你使用多语言模型，你得指定你的源语言和目标语言的参数</li>
+</ul>
+</blockquote>
+<hr>
+<h1 id="Preprocessing"><a href="#Preprocessing" class="headerlink" title="Preprocessing"></a>Preprocessing</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">split_datasets = raw_datasets[&quot;train&quot;].train_test_split(train_size=0.9, seed=20)</span><br><span class="line">split_datasets</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">DatasetDict(&#123;</span><br><span class="line">    train: Dataset(&#123;</span><br><span class="line">        features: [&#x27;id&#x27;, &#x27;translation&#x27;],</span><br><span class="line">        num_rows: 189155</span><br><span class="line">    &#125;)</span><br><span class="line">    test: Dataset(&#123;</span><br><span class="line">        features: [&#x27;id&#x27;, &#x27;translation&#x27;],</span><br><span class="line">        num_rows: 21018</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">split_datasets[&quot;validation&quot;] = split_datasets.pop(&quot;test&quot;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>HF的dataset可以直接调用<code>.train_test_split(train_size=0.9, seed=20)</code></p>
+<ul>
+<li>HF的dataset可以直接转DataFrame，这样你也可以直接配合Sklearn使用</li>
+</ul>
+</li>
+<li><p>给test重命名为validation</p>
+</li>
+</ul>
+<h2 id="DataCollatorForSeq2Seq"><a href="#DataCollatorForSeq2Seq" class="headerlink" title="DataCollatorForSeq2Seq"></a>DataCollatorForSeq2Seq</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">max_length = 128</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def preprocess_function(examples):</span><br><span class="line">    inputs = [ex[&quot;en&quot;] for ex in examples[&quot;translation&quot;]]</span><br><span class="line">    targets = [ex[&quot;fr&quot;] for ex in examples[&quot;translation&quot;]]</span><br><span class="line">    model_inputs = tokenizer(</span><br><span class="line">        inputs, text_target=targets, max_length=max_length, truncation=True</span><br><span class="line">    )</span><br><span class="line">    return model_inputs</span><br><span class="line">    </span><br><span class="line">tokenized_datasets = dataset.map(</span><br><span class="line">    preprocess_function,</span><br><span class="line">    batched=True,</span><br><span class="line">    remove_columns=dataset[&quot;train&quot;].column_names,)</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>We don’t pay attention to the attention mask of the targets, as the model won’t expect it. Instead, <strong>the labels corresponding to a padding token should be set to <code>-100</code> so they are ignored in the loss computatio</strong>n. This will be done by our data collator later on since we are applying dynamic padding, but if you use padding here, you should adapt the preprocessing function to set all labels that correspond to the padding token to <code>-100</code>.</p>
+<p>这里我们不会加入padding，mask。之后我们的mask会设成-100 使其不会计算损失。这些都是下一步的操作</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">from transformers import DataCollatorForSeq2Seq</span><br><span class="line"></span><br><span class="line">data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)</span><br><span class="line">batch = data_collator([tokenized_datasets[&quot;train&quot;][i] for i in range(1, 3)])</span><br><span class="line">batch.keys()</span><br><span class="line"># dict_keys([&#x27;attention_mask&#x27;, &#x27;input_ids&#x27;, &#x27;labels&#x27;, &#x27;decoder_input_ids&#x27;])</span><br><span class="line"></span><br><span class="line">batch[&quot;labels&quot;]</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"> tensor([[57483,     7,  3241,   403,     3,   289,  1817, 25787,    22,     6,</span><br><span class="line">          38697,    22,     2,     3,   426,    64,    72, 27734,    14,  9054,</span><br><span class="line">          56467,  6667,     8,   721,   512,  2498,   209,    64,    72, 11468,</span><br><span class="line">              5,   393,     3,  2597,     4,     3,  1817,     2,   469,   235,</span><br><span class="line">            238, 24898,    39,     8, 13579,    50, 17528,     2,    60,    42,</span><br><span class="line">          56548,     2,   695,   443, 10119,  5543,     8, 53617,     7, 38261,</span><br><span class="line">          40490,    22,     5,     0],</span><br><span class="line">         [   24, 22026,    30,  2329, 10349, 22901,    20, 52813,    17,    50,</span><br><span class="line">             12, 29940,     4,     3,  2121,    20,  1843,    45,    67,   243,</span><br><span class="line">           1945,    30,   368, 36681,    10,     3,  1796,     4, 14961,  2203,</span><br><span class="line">              6, 28291,     3, 22986,     2, 11355,     3,  3368,    64,  8700,</span><br><span class="line">             18,   469, 38575,    10,   278,    54,     8,  4291,    57, 22301,</span><br><span class="line">           1718,     8,   959, 30229,  1294,  6855,  4298,     5,     0,  -100,</span><br><span class="line">           -100,  -100,  -100,  -100]])&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line"># 看下原来的token</span><br><span class="line">for i in range(1, 3):</span><br><span class="line">    print(tokenized_datasets[&quot;train&quot;][i][&quot;labels&quot;])</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[57483, 7, 3241, 403, 3, 289, 1817, 25787, 22, 6, 38697, 22, 2, 3, 426, 64, 72, 27734, 14, 9054, 56467, 6667, 8, 721, 512, 2498, 209, 64, 72, 11468, 5, 393, 3, 2597, 4, 3, 1817, 2, 469, 235, 238, 24898, 39, 8, 13579, 50, 17528, 2, 60, 42, 56548, 2, 695, 443, 10119, 5543, 8, 53617, 7, 38261, 40490, 22, 5, 0]</span><br><span class="line">[24, 22026, 30, 2329, 10349, 22901, 20, 52813, 17, 50, 12, 29940, 4, 3, 2121, 20, 1843, 45, 67, 243, 1945, 30, 368, 36681, 10, 3, 1796, 4, 14961, 2203, 6, 28291, 3, 22986, 2, 11355, 3, 3368, 64, 8700, 18, 469, 38575, 10, 278, 54, 8, 4291, 57, 22301, 1718, 8, 959, 30229, 1294, 6855, 4298, 5, 0]&#x27;&#x27;&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>可以看到padding的位置都变成-100了，<a href="https://poyone.github.io/posts/13310.html">pytorch中也有这个设定可见我之前讲Transformer的内容</a></li>
+</ul>
+<blockquote>
+<p> This is all done by a <a target="_blank" rel="noopener" href="https://huggingface.co/transformers/main_classes/data_collator.html#datacollatorforseq2seq"><code>DataCollatorForSeq2Seq</code></a>. Like the <code>DataCollatorWithPadding</code>, it takes the <code>tokenizer</code> used to preprocess the inputs, but it also takes the <code>model</code>. This is because this <strong>data collator will also be responsible for preparing the decoder input IDs</strong>, which are <strong>shifted versions of the labels</strong>（移动版的标签） with a special token at the beginning. Since this shift is done slightly differently for different architectures, the <code>DataCollatorForSeq2Seq</code> needs to know the <code>model</code> object<del>搞得还挺复杂</del></p>
+</blockquote>
+<hr>
+<h1 id="Metrics"><a href="#Metrics" class="headerlink" title="Metrics"></a>Metrics</h1><blockquote>
+<p>One weakness with <strong>BLEU is that it expects the text to already be tokenized</strong>, <strong>which makes it difficult to compare scores</strong> <strong>between models that use different tokenizers</strong>. So instead, the most commonly used metric for <strong>benchmarking translation models today is <a target="_blank" rel="noopener" href="https://github.com/mjpost/sacrebleu">SacreBLEU</a>,</strong> which addresses this weakness (and others) by standardizing the tokenization step</p>
+</blockquote>
+<ul>
+<li>这里我们加入SacreBLEU作为评分标准</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">!pip install sacrebleu	</span><br><span class="line"></span><br><span class="line">import evaluate</span><br><span class="line">metric = evaluate.load(&quot;sacrebleu&quot;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>示例1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">predictions = [</span><br><span class="line">    &quot;This plugin lets you translate web pages between several languages automatically.&quot;</span><br><span class="line">]</span><br><span class="line">references = [</span><br><span class="line">    [</span><br><span class="line">        &quot;This plugin allows you to automatically translate web pages between several languages.&quot;</span><br><span class="line">    ]</span><br><span class="line">]</span><br><span class="line">metric.compute(predictions=predictions, references=references)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;score&#x27;: 46.750469682990165,</span><br><span class="line"> &#x27;counts&#x27;: [11, 6, 4, 3],</span><br><span class="line"> &#x27;totals&#x27;: [12, 11, 10, 9],</span><br><span class="line"> &#x27;precisions&#x27;: [91.67, 54.54, 40.0, 33.33],</span><br><span class="line"> &#x27;bp&#x27;: 0.9200444146293233,</span><br><span class="line"> &#x27;sys_len&#x27;: 12,</span><br><span class="line"> &#x27;ref_len&#x27;: 13&#125;&#x27;&#x27;&#x27;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+
+
+<p>示例2</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">predictions = [&quot;This This This This&quot;]</span><br><span class="line">references = [</span><br><span class="line">    [</span><br><span class="line">        &quot;This plugin allows you to automatically translate web pages between several languages.&quot;</span><br><span class="line">    ]</span><br><span class="line">]</span><br><span class="line">metric.compute(predictions=predictions, references=references)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;score&#x27;: 1.683602693167689,</span><br><span class="line"> &#x27;counts&#x27;: [1, 0, 0, 0],</span><br><span class="line"> &#x27;totals&#x27;: [4, 3, 2, 1],</span><br><span class="line"> &#x27;precisions&#x27;: [25.0, 16.67, 12.5, 12.5],</span><br><span class="line"> &#x27;bp&#x27;: 0.10539922456186433,</span><br><span class="line"> &#x27;sys_len&#x27;: 4,</span><br><span class="line"> &#x27;ref_len&#x27;: 13&#125;&#x27;&#x27;&#x27;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>This gets a BLEU score of 46.75, which is rather good — for reference, the original Transformer model in the <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1706.03762.pdf">“Attention Is All You Need” paper</a> achieved a BLEU score of 41.8 on a similar translation task between English and French! (For more information about the individual metrics, like <code>counts</code> and <code>bp</code>, see the <a target="_blank" rel="noopener" href="https://github.com/mjpost/sacrebleu/blob/078c440168c6adc89ba75fe6d63f0d922d42bcfe/sacrebleu/metrics/bleu.py#L74">SacreBLEU repository</a>.) </p>
+<ul>
+<li>已经比擎天柱还厉害了，另外的标准如下:<ul>
+<li>score: The BLEU score.  </li>
+<li>counts: List of counts of correct ngrams, 1 &lt;&#x3D; n &lt;&#x3D; max_ngram_order  </li>
+<li>totals: List of counts of total ngrams, 1 &lt;&#x3D; n &lt;&#x3D; max_ngram_order </li>
+<li>precisions: List of precisions, 1 &lt;&#x3D; n &lt;&#x3D; max_ngram_order  </li>
+<li>bp: The brevity penalty. </li>
+<li>sys_len: The cumulative system length.</li>
+<li>ref_len: The cumulative reference length.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h2 id="Compute-metrics"><a href="#Compute-metrics" class="headerlink" title="Compute_metrics"></a>Compute_metrics</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def compute_metrics(eval_preds):</span><br><span class="line">    preds, labels = eval_preds</span><br><span class="line">    # In case the model returns more than the prediction logits</span><br><span class="line">    if isinstance(preds, tuple):</span><br><span class="line">        preds = preds[0]</span><br><span class="line"></span><br><span class="line">    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)</span><br><span class="line"></span><br><span class="line">    # Replace -100s in the labels as we can&#x27;t decode them</span><br><span class="line">    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)</span><br><span class="line">    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)</span><br><span class="line"></span><br><span class="line">    # Some simple post-processing</span><br><span class="line">    decoded_preds = [pred.strip() for pred in decoded_preds]</span><br><span class="line">    decoded_labels = [[label.strip()] for label in decoded_labels]</span><br><span class="line"></span><br><span class="line">    result = metric.compute(predictions=decoded_preds, references=decoded_labels)</span><br><span class="line">    return &#123;&quot;bleu&quot;: result[&quot;score&quot;]&#125;</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>因为decode会自动处理pad_token所以使用<code>np.where</code>将-100都替换成pad_token<ul>
+<li>numpy.where(condition,  x，y) ，x中条件不成立的都会被填充y</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="Training-Loop"><a href="#Training-Loop" class="headerlink" title="Training Loop"></a>Training Loop</h1><p>首先看下<code>Seq2SeqTrainer</code> 然后回到自定义的Loop</p>
+<h2 id="Seq2SeqTrainer"><a href="#Seq2SeqTrainer" class="headerlink" title="Seq2SeqTrainer"></a>Seq2SeqTrainer</h2><p>这里不是重点，但是有些细节可圈可点。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from transformers import Seq2SeqTrainingArguments</span><br><span class="line"></span><br><span class="line">args = Seq2SeqTrainingArguments(</span><br><span class="line">    f&quot;marian-finetuned-kde4-en-to-fr&quot;,</span><br><span class="line">    evaluation_strategy=&quot;no&quot;,</span><br><span class="line">    save_strategy=&quot;epoch&quot;,</span><br><span class="line">    learning_rate=2e-5,</span><br><span class="line">    per_device_train_batch_size=32,</span><br><span class="line">    per_device_eval_batch_size=64,</span><br><span class="line">    weight_decay=0.01,</span><br><span class="line">    save_total_limit=3,</span><br><span class="line">    num_train_epochs=3,</span><br><span class="line">    predict_with_generate=True,</span><br><span class="line">    fp16=True,</span><br><span class="line">    push_to_hub=True,</span><br><span class="line">)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>定义参数</p>
+<ul>
+<li>We don’t set any regular evaluation, as evaluation takes a while; we will just evaluate our model once before training and after.<ul>
+<li>由于我们自定义评价标准，这里我们在模型训练前测一次scores，训练完成后再测一次</li>
+</ul>
+</li>
+<li>We set <code>fp16=True</code>, which speeds up training on modern GPUs.</li>
+<li>We set <code>predict_with_generate=True</code>, as discussed above.<ul>
+<li>the decoder performs inference by predicting tokens one by one — something that’s implemented behind the scenes in 🤗 Transformers by the <code>generate()</code> method. The <code>Seq2SeqTrainer</code> will let us use that method for evaluation if we set <code>predict_with_generate=True</code>.</li>
+</ul>
+</li>
+<li>We use <code>push_to_hub=True</code> to upload the model to the Hub at the end of each epoch</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">from transformers import Seq2SeqTrainer</span><br><span class="line"></span><br><span class="line">trainer = Seq2SeqTrainer(</span><br><span class="line">    model,</span><br><span class="line">    args,</span><br><span class="line">    train_dataset=tokenized_datasets[&quot;train&quot;],</span><br><span class="line">    eval_dataset=tokenized_datasets[&quot;validation&quot;],</span><br><span class="line">    data_collator=data_collator,</span><br><span class="line">    tokenizer=tokenizer,</span><br><span class="line">    compute_metrics=compute_metrics,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">trainer.evaluate(max_length=max_length)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;eval_loss&#x27;: 1.6964408159255981,</span><br><span class="line"> &#x27;eval_bleu&#x27;: 39.26865061007616,</span><br><span class="line"> &#x27;eval_runtime&#x27;: 965.8884,</span><br><span class="line"> &#x27;eval_samples_per_second&#x27;: 21.76,</span><br><span class="line"> &#x27;eval_steps_per_second&#x27;: 0.341&#125;&#x27;&#x27;&#x27;</span><br><span class="line"> </span><br><span class="line"> trainer.train()</span><br><span class="line"> trainer.evaluate(max_length=max_length)</span><br><span class="line"> &#x27;&#x27;&#x27;</span><br><span class="line"> &#123;&#x27;eval_loss&#x27;: 0.8558505773544312,</span><br><span class="line"> &#x27;eval_bleu&#x27;: 52.94161337775576,</span><br><span class="line"> &#x27;eval_runtime&#x27;: 714.2576,</span><br><span class="line"> &#x27;eval_samples_per_second&#x27;: 29.426,</span><br><span class="line"> &#x27;eval_steps_per_second&#x27;: 0.461,</span><br><span class="line"> &#x27;epoch&#x27;: 3.0&#125;&#x27;&#x27;&#x27;</span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+
+<p><strong>That’s a nearly 14-point improvement, which is great.</strong></p>
+<h2 id="Custom-Training-Loop"><a href="#Custom-Training-Loop" class="headerlink" title="Custom Training Loop"></a>Custom Training Loop</h2><p>接下来就是重点了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from torch.utils.data import DataLoader</span><br><span class="line">from transformers import AdamW</span><br><span class="line"></span><br><span class="line">tokenized_datasets.set_format(&quot;torch&quot;)</span><br><span class="line">train_dataloader = DataLoader(</span><br><span class="line">    tokenized_datasets[&quot;train&quot;],</span><br><span class="line">    shuffle=True,</span><br><span class="line">    collate_fn=data_collator, # 就是上面的DataCollatorForSeq2Seq(tokenizer, model=model)</span><br><span class="line">    batch_size=8,</span><br><span class="line">)</span><br><span class="line">eval_dataloader = DataLoader(</span><br><span class="line">    tokenized_datasets[&quot;validation&quot;], collate_fn=data_collator, batch_size=8</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint)</span><br><span class="line">optimizer = AdamW(model.parameters(), lr=2e-5)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>以上是常规定义</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from accelerate import Accelerator</span><br><span class="line">from transformers import get_scheduler</span><br><span class="line"></span><br><span class="line">accelerator = Accelerator()</span><br><span class="line">model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(</span><br><span class="line">    model, optimizer, train_dataloader, eval_dataloader)</span><br><span class="line"></span><br><span class="line">num_train_epochs = 3</span><br><span class="line">num_update_steps_per_epoch = len(train_dataloader)</span><br><span class="line">num_training_steps = num_train_epochs * num_update_steps_per_epoch</span><br><span class="line"></span><br><span class="line">lr_scheduler = get_scheduler(</span><br><span class="line">    &quot;linear&quot;,</span><br><span class="line">    optimizer=optimizer,</span><br><span class="line">    num_warmup_steps=0,</span><br><span class="line">    num_training_steps=num_training_steps,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这两部分都需要注意</p>
+<ul>
+<li>Once we have all those objects, we can send them to the <code>accelerator.prepare()</code> method. Remember that if you want to train on TPUs in a Colab notebook, you will need to move all of this code into a training function, and that shouldn’t execute any cell that instantiates an <code>Accelerator</code><ul>
+<li>不要在没有把所有部件转到TPU前使用<code>Accelerator</code></li>
+</ul>
+</li>
+<li>we can use its length to compute the number of training steps. Remember we should always do this after preparing the dataloader, as that method will change the length of the <code>DataLoader</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def postprocess(predictions, labels):</span><br><span class="line">    predictions = predictions.cpu().numpy()</span><br><span class="line">    labels = labels.cpu().numpy()</span><br><span class="line"></span><br><span class="line">    decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)</span><br><span class="line"></span><br><span class="line">    # Replace -100 in the labels as we can&#x27;t decode them.</span><br><span class="line">    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)</span><br><span class="line">    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)</span><br><span class="line"></span><br><span class="line">    # Some simple post-processing</span><br><span class="line">    decoded_preds = [pred.strip() for pred in decoded_preds]</span><br><span class="line">    decoded_labels = [[label.strip()] for label in decoded_labels]</span><br><span class="line">    return decoded_preds, decoded_labels</span><br></pre></td></tr></table></figure>
+
+<p>正式训练之前，先定义一下后处理函数，输出我们预测的标签给Sacrebleu</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">from tqdm.auto import tqdm</span><br><span class="line">import torch</span><br><span class="line"></span><br><span class="line">progress_bar = tqdm(range(num_training_steps))</span><br><span class="line"></span><br><span class="line">for epoch in range(num_train_epochs):</span><br><span class="line">    # Training</span><br><span class="line">    model.train()</span><br><span class="line">    for batch in train_dataloader:</span><br><span class="line">        outputs = model(**batch)</span><br><span class="line">        loss = outputs.loss</span><br><span class="line">        accelerator.backward(loss)</span><br><span class="line"></span><br><span class="line">        optimizer.step()</span><br><span class="line">        lr_scheduler.step()</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        progress_bar.update(1)</span><br><span class="line"></span><br><span class="line">    # Evaluation</span><br><span class="line">    model.eval()</span><br><span class="line">    for batch in tqdm(eval_dataloader):</span><br><span class="line">        with torch.no_grad():</span><br><span class="line">            generated_tokens = accelerator.unwrap_model(model).generate(</span><br><span class="line">                batch[&quot;input_ids&quot;],</span><br><span class="line">                attention_mask=batch[&quot;attention_mask&quot;],</span><br><span class="line">                max_length=128,</span><br><span class="line">            )</span><br><span class="line">        labels = batch[&quot;labels&quot;]</span><br><span class="line"></span><br><span class="line">        # Necessary to pad predictions and labels for being gathered</span><br><span class="line">        generated_tokens = accelerator.pad_across_processes(</span><br><span class="line">            generated_tokens, dim=1, pad_index=tokenizer.pad_token_id</span><br><span class="line">        )</span><br><span class="line">        labels = accelerator.pad_across_processes(labels, dim=1, pad_index=-100)</span><br><span class="line"></span><br><span class="line">        predictions_gathered = accelerator.gather(generated_tokens)</span><br><span class="line">        labels_gathered = accelerator.gather(labels)</span><br><span class="line"></span><br><span class="line">        decoded_preds, decoded_labels = postprocess(predictions_gathered, labels_gathered)</span><br><span class="line">        metric.add_batch(predictions=decoded_preds, references=decoded_labels)</span><br><span class="line"></span><br><span class="line">    results = metric.compute()</span><br><span class="line">    print(f&quot;epoch &#123;epoch&#125;, BLEU score: &#123;results[&#x27;score&#x27;]:.2f&#125;&quot;)</span><br><span class="line"></span><br><span class="line">    # Save and upload</span><br><span class="line">    accelerator.wait_for_everyone()</span><br><span class="line">    unwrapped_model = accelerator.unwrap_model(model)</span><br><span class="line">    unwrapped_model.save_pretrained(output_dir, save_function=accelerator.save)</span><br><span class="line">    if accelerator.is_main_process:</span><br><span class="line">        tokenizer.save_pretrained(output_dir)</span><br><span class="line">        repo.push_to_hub(</span><br><span class="line">            commit_message=f&quot;Training in progress epoch &#123;epoch&#125;&quot;, blocking=False</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<hr>
+<p>最后通过pipeline测试下输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from transformers import pipeline</span><br><span class="line"></span><br><span class="line"># Replace this with your own checkpoint</span><br><span class="line">model_checkpoint = &quot;huggingface-course/marian-finetuned-kde4-en-to-fr&quot;</span><br><span class="line">translator = pipeline(&quot;translation&quot;, model=model_checkpoint)</span><br><span class="line">translator(&quot;Default to expanded threads&quot;)</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__title"><span class="post-copyright-info"><h>NLP Baseline 01 翻译</h></span></div><div class="post-copyright__type"><span class="post-copyright-info"><a href="https://poyone.github.io/posts/58033.html">https://poyone.github.io/posts/58033.html</a></span></div><div class="post-copyright-m"><div class="post-copyright-m-info"><div class="post-copyright-a"><h>作者</h><div class="post-copyright-cc-info"><h>Poy One</h></div></div><div class="post-copyright-c"><h>发布于</h><div class="post-copyright-cc-info"><h>2022-12-05</h></div></div><div class="post-copyright-u"><h>更新于</h><div class="post-copyright-cc-info"><h>2022-12-05</h></div></div><div class="post-copyright-c"><h>许可协议</h><div class="post-copyright-cc-info"><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a rel="noopener" target="_blank" title="CC BY-NC-SA 4.0" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></div></div></div></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Huggingface/">Huggingface</a></div><div class="post_share"><div class="social-share" data-image="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/2534.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/made in Abyss/nanachi02.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">22-12-3 e.g etc. 详解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Poy One</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/poyone"><i></i><span>🛴前往github...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/poyone" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:poyone1222@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客 <br> QQ 914987163</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%85%E5%AE%8C%E6%88%90"><span class="toc-text">待完成</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Translation"><span class="toc-text">Translation</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B%E6%9F%A5%E7%9C%8B"><span class="toc-text">示例查看</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Preprocessing"><span class="toc-text">Preprocessing</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DataCollatorForSeq2Seq"><span class="toc-text">DataCollatorForSeq2Seq</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Metrics"><span class="toc-text">Metrics</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Compute-metrics"><span class="toc-text">Compute_metrics</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Training-Loop"><span class="toc-text">Training Loop</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Seq2SeqTrainer"><span class="toc-text">Seq2SeqTrainer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Custom-Training-Loop"><span class="toc-text">Custom Training Loop</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By Poy One</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer src="/js/light.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show","#web_bg",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka15.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CV/&quot;);" href="javascript:void(0);">CV</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">计算机视觉</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka22.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/NLP/&quot;);" href="javascript:void(0);">NLP</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">自然语言处理</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka10.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Trick/&quot;);" href="javascript:void(0);">Trick</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">import torch as tf</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka29.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Dive-Into-Paper/&quot;);" href="javascript:void(0);">Dive Into Paper</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">论文精读</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka16.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Python/&quot;);" href="javascript:void(0);">Python</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">流畅的Python</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka32.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Universe/&quot;);" href="javascript:void(0);">Universe</a><span class="categoryBar-list-count">5</span><span class="categoryBar-list-descr">拥有一切 却变成太空</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><!-- hexo injector body_end end --></body></html>
