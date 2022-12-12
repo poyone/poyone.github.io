@@ -1,0 +1,353 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>HF Course 04 Dataset | Attention Is A Talent</title><meta name="author" content="Poy One"><meta name="copyright" content="Poy One"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="加载本地数据   Data format Loading script Example    CSV &amp; TSV csv load_dataset(&quot;csv&quot;, data_files&#x3D;&quot;my_file.csv&quot;)   Text files text load_dataset(&quot;text&quot;, data_files&#x3D;&quot;my_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HF Course 04 Dataset">
+<meta property="og:url" content="https://poyone.github.io/posts/4498.html">
+<meta property="og:site_name" content="Attention Is A Talent">
+<meta property="og:description" content="加载本地数据   Data format Loading script Example    CSV &amp; TSV csv load_dataset(&quot;csv&quot;, data_files&#x3D;&quot;my_file.csv&quot;)   Text files text load_dataset(&quot;text&quot;, data_files&#x3D;&quot;my_">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp">
+<meta property="article:published_time" content="2022-12-11T07:18:25.982Z">
+<meta property="article:modified_time" content="2022-12-12T04:01:21.013Z">
+<meta property="article:author" content="Poy One">
+<meta property="article:tag" content="Huggingface">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp"><link rel="shortcut icon" href="https://npm.elemecdn.com/poyone1222/eris/eris11.webp"><link rel="canonical" href="https://poyone.github.io/posts/4498"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HF Course 04 Dataset',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-12 12:01:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://npm.elemecdn.com/poyone1222/eris/Eris32.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Attention Is A Talent</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HF Course 04 Dataset</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-11T07:18:25.982Z" title="发表于 2022-12-11 15:18:25">2022-12-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-12T04:01:21.013Z" title="更新于 2022-12-12 12:01:21">2022-12-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Universe/">Universe</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HF Course 04 Dataset"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="加载本地数据"><a href="#加载本地数据" class="headerlink" title="加载本地数据"></a>加载本地数据</h1><table>
+<thead>
+<tr>
+<th>Data format</th>
+<th>Loading script</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CSV &amp; TSV</td>
+<td><code>csv</code></td>
+<td><code>load_dataset(&quot;csv&quot;, data_files=&quot;my_file.csv&quot;)</code></td>
+</tr>
+<tr>
+<td>Text files</td>
+<td><code>text</code></td>
+<td><code>load_dataset(&quot;text&quot;, data_files=&quot;my_file.txt&quot;)</code></td>
+</tr>
+<tr>
+<td>JSON &amp; JSON Lines</td>
+<td><code>json</code></td>
+<td><code>load_dataset(&quot;json&quot;, data_files=&quot;my_file.jsonl&quot;)</code></td>
+</tr>
+<tr>
+<td>Pickled DataFrames</td>
+<td><code>pandas</code></td>
+<td><code>load_dataset(&quot;pandas&quot;, data_files=&quot;my_dataframe.pkl&quot;)</code></td>
+</tr>
+</tbody></table>
+<p>分别需要做，指明数据类型，指明文件路径</p>
+<h2 id="data-files参数"><a href="#data-files参数" class="headerlink" title="data_files参数"></a>data_files参数</h2><p>The <code>data_files</code> argument of the <code>load_dataset()</code> function is quite flexible and can be either a single file path, a list of file paths, or a dictionary that maps split names to file paths. You can also glob files that match a specified pattern according to the rules used by the Unix shell (e.g., you can glob all the JSON files in a directory as a single split by setting <code>data_files=&quot;*.json&quot;</code>). See the 🤗 Datasets <a target="_blank" rel="noopener" href="https://huggingface.co/docs/datasets/loading.html#local-and-remote-files">documentation</a> for more details.</p>
+<ul>
+<li><p>可以做文件路径</p>
+</li>
+<li><p>可以做split将数据映射成想要的字典格式</p>
+<ul>
+<li><p>&#96;&#96;&#96;<br>data_files &#x3D; {“train”: “SQuAD_it-train.json”, “test”: “SQuAD_it-test.json”}<br>squad_it_dataset &#x3D; load_dataset(“json”, data_files&#x3D;data_files, field&#x3D;”data”)<br>squad_it_dataset</p>
+<p>‘’’<br>DatasetDict({<br>train: Dataset({<br>    features: [‘title’, ‘paragraphs’],<br>    num_rows: 442<br>})<br>test: Dataset({<br>    features: [‘title’, ‘paragraphs’],<br>    num_rows: 48<br>})<br>})’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">## 加载服务器数据</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>url &#x3D; “<a target="_blank" rel="noopener" href="https://github.com/crux82/squad-it/raw/master/&quot;">https://github.com/crux82/squad-it/raw/master/&quot;</a><br>data_files &#x3D; {<br>    “train”: url + “SQuAD_it-train.json.gz”,<br>    “test”: url + “SQuAD_it-test.json.gz”,<br>}<br>squad_it_dataset &#x3D; load_dataset(“json”, data_files&#x3D;data_files, field&#x3D;”data”)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 数据处理</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 分隔符</span><br><span class="line"></span><br><span class="line">如果你的数据不是传统的CSV格式(以逗号分割)，你可以指定分隔符</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>from datasets import load_dataset</p>
+<p>data_files &#x3D; {“train”: “drugsComTrain_raw.tsv”, “test”: “drugsComTest_raw.tsv”}</p>
+<h1 id="t-is-the-tab-character-in-Python"><a href="#t-is-the-tab-character-in-Python" class="headerlink" title="\t is the tab character in Python"></a>\t is the tab character in Python</h1><p>drug_dataset &#x3D; load_dataset(“csv”, data_files&#x3D;data_files, delimiter&#x3D;”\t”)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 随机选取样本</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>drug_sample &#x3D; drug_dataset[“train”].shuffle(seed&#x3D;42).select(range(1000))</p>
+<h1 id="Peek-at-the-first-few-examples"><a href="#Peek-at-the-first-few-examples" class="headerlink" title="Peek at the first few examples"></a>Peek at the first few examples</h1><p>drug_sample[:3]</p>
+<p>‘’’<br>{‘Unnamed: 0’: [87571, 178045, 80482],<br> ‘drugName’: [‘Naproxen’, ‘Duloxetine’, ‘Mobic’],<br> ‘condition’: [‘Gout, Acute’, ‘ibromyalgia’, ‘Inflammatory Conditions’],<br> ‘review’: [‘“like the previous person mention, I&amp;#039;m a strong believer of aleve, it works faster for my gout than the prescription meds I take. No more going to the doctor for refills…..Aleve works!”‘,<br>  ‘“I have taken Cymbalta for about a year and a half for fibromyalgia pain. It is great\r\nas a pain reducer and an anti-depressant, however, the side effects outweighed \r\nany benefit I got from it. I had trouble with restlessness, being tired constantly,\r\ndizziness, dry mouth, numbness and tingling in my feet, and horrible sweating. I am\r\nbeing weaned off of it now. Went from 60 mg to 30mg and now to 15 mg. I will be\r\noff completely in about a week. The fibro pain is coming back, but I would rather deal with it than the side effects.”‘,<br>  ‘“I have been taking Mobic for over a year with no side effects other than an elevated blood pressure.  I had severe knee and ankle pain which completely went away after taking Mobic.  I attempted to stop the medication however pain returned after a few days.”‘],<br> ‘rating’: [9.0, 3.0, 10.0],<br> ‘date’: [‘September 2, 2015’, ‘November 7, 2011’, ‘June 5, 2013’],<br> ‘usefulCount’: [36, 13, 128]}’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 重命名</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>drug_dataset &#x3D; drug_dataset.rename_column(<br>    original_column_name&#x3D;”Unnamed: 0”, new_column_name&#x3D;”patient_id”<br>)<br>drug_dataset<br>‘’’<br>DatasetDict({<br>    train: Dataset({<br>        features: [‘patient_id’, ‘drugName’, ‘condition’, ‘review’, ‘rating’, ‘date’, ‘usefulCount’],<br>        num_rows: 161297<br>    })<br>    test: Dataset({<br>        features: [‘patient_id’, ‘drugName’, ‘condition’, ‘review’, ‘rating’, ‘date’, ‘usefulCount’],<br>        num_rows: 53766<br>    })<br>})’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">补充一个匿名表达式的细节</span><br><span class="line"></span><br><span class="line">&gt; `(lambda base, height: 0.5 * base * height)(4, 8)`</span><br><span class="line">&gt;</span><br><span class="line">&gt; 16 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 转换大小写</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>def lowercase_condition(example):<br>    return {“condition”: example[“condition”].lower()}</p>
+<p>drug_dataset.map(lowercase_condition)<br>‘’’<br>AttributeError: ‘NoneType’ object has no attribute ‘lower’’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">这里报错了</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## filter</span><br><span class="line"></span><br><span class="line">`dataset.filter`</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>drug_dataset &#x3D; drug_dataset.filter(lambda x: x[“condition”] is not None)</p>
+<p>drug_dataset &#x3D; drug_dataset.map(lowercase_condition)</p>
+<h1 id="Check-that-lowercasing-worked"><a href="#Check-that-lowercasing-worked" class="headerlink" title="Check that lowercasing worked"></a>Check that lowercasing worked</h1><p>drug_dataset[“train”][“condition”][:3]</p>
+<p>‘’’<br>[‘left ventricular dysfunction’, ‘adhd’, ‘birth control’]’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">过滤筛选合格的数据样本</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 增加列</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>def compute_review_length(example):<br>    return {“review_length”: len(example[“review”].split())}</p>
+<p>drug_dataset &#x3D; drug_dataset.map(compute_review_length)</p>
+<h1 id="Inspect-the-first-training-example"><a href="#Inspect-the-first-training-example" class="headerlink" title="Inspect the first training example"></a>Inspect the first training example</h1><p>drug_dataset[“train”][0]<br>‘’’<br>{‘patient_id’: 206461,<br> ‘drugName’: ‘Valsartan’,<br> ‘condition’: ‘left ventricular dysfunction’,<br> ‘review’: ‘“It has no side effect, I take it in combination of Bystolic 5 Mg and Fish Oil”‘,<br> ‘rating’: 9.0,<br> ‘date’: ‘May 20, 2012’,<br> ‘usefulCount’: 27,<br> ‘review_length’: 17}’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">补充一个sort</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>drug_dataset[“train”].sort(“review_length”)[:3]<br>‘’’<br>{‘patient_id’: [103488, 23627, 20558],<br>‘drugName’: [‘Loestrin 21 1 &#x2F; 20’, ‘Chlorzoxazone’, ‘Nucynta’],<br>‘condition’: [‘birth control’, ‘muscle spasm’, ‘pain’],<br>‘review’: [‘“Excellent.”‘, ‘“useless”‘, ‘“ok”‘],<br>‘rating’: [10.0, 1.0, 6.0],<br>‘date’: [‘November 4, 2008’, ‘March 24, 2017’, ‘August 20, 2016’],<br>‘usefulCount’: [5, 2, 10],<br>‘review_length’: [1, 1, 1]}’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&gt;sort应该也有reverse选项，如果真要做EDA还是用Pandas好了, [查看可配置参数](https://huggingface.co/docs/datasets/package_reference/main_classes#datasets.Dataset.sort)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在补充一个`Dataset.add_column()`</span><br><span class="line"></span><br><span class="line">An alternative way to add new columns to a dataset is with the `Dataset.add_column()` function. This allows you to provide the column as a Python list or NumPy array and can be handy in situations where `Dataset.map()` is not well suited for your analysis.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 解析html字符</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>import html</p>
+</blockquote>
+<p>text &#x3D; “I&amp;#039;m a transformer called BERT”<br>html.unescape(text)</p>
+<p>‘’’<br>“I’m a transformer called BERT”<br>‘’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>drug_dataset &#x3D; drug_dataset.map(lambda x: {“review”: html.unescape(x[“review”])})</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># map 方法</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## batch</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">When you specify `batched=True` the function receives a dictionary with the fields of the dataset, but each value is now a *list of values*, and not just a single value. The return value of `Dataset.map()` should be the same: a dictionary with the fields we want to update or add to our dataset, and a list of values. </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>new_drug_dataset &#x3D; drug_dataset.map(<br>    lambda x: {“review”: [html.unescape(o) for o in x[“review”]]}, batched&#x3D;True<br>)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">批量处理为True的话，每次传进来就是一个字典批次。一般我们做的就是更新这个数据集</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">If you’re running this code in a notebook, you’ll see that this command executes way faster than the previous one. And it’s not because our reviews have already been HTML-unescaped — if you re-execute the instruction from the previous section (without `batched=True`), it will take the same amount of time as before. This is because list comprehensions are usually faster than executing the same code in a `for` loop, and we also gain some performance by accessing lots of elements at the same time instead of one by one.</span><br><span class="line"></span><br><span class="line">之前单个处理的用的是for循环，这里批量处理就可以用列表推导式，要快的多</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 配合tokenizer使用</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>def tokenize_and_split(examples):<br>    return tokenizer(<br>        examples[“review”],<br>        truncation&#x3D;True,<br>        max_length&#x3D;128,<br>        return_overflowing_tokens&#x3D;True,<br>    )</p>
+<p>result &#x3D; tokenize_and_split(drug_dataset[“train”][0])<br>[len(inp) for inp in result[“input_ids”]]</p>
+<h1 id="128-49"><a href="#128-49" class="headerlink" title="[128, 49]"></a>[128, 49]</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">使用`return_overflowing_tokens`参数来接受截断的部分，这里我们177的长度变成了128和49两份</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>tokenized_dataset &#x3D; drug_dataset.map(tokenize_and_split, batched&#x3D;True)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 数据类型转换</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Pandas</span><br><span class="line"></span><br><span class="line">To enable the conversion between various third-party libraries, 🤗 Datasets provides a `Dataset.set_format()` function. This function only changes the *output format* of the dataset, so you can easily switch to another format without affecting the underlying *data format*, which is Apache Arrow. The formatting is done in place. To demonstrate, let’s convert our dataset to Pandas:</span><br><span class="line"></span><br><span class="line">`drug_dataset.set_format(&quot;pandas&quot;)`</span><br><span class="line"></span><br><span class="line">一般使用`train_df = drug_dataset[&quot;train&quot;][:]` 获得整体的切片作为新的Dataframe 可以自己尝试是否返回对象为hf的dataset</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>from datasets import Dataset</p>
+<p>freq_dataset &#x3D; Dataset.from_pandas(frequencies)<br>freq_dataset<br>‘’’<br>Dataset({<br>    features: [‘condition’, ‘frequency’],<br>    num_rows: 819<br>})’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">可以转换回来</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># train_test_split</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>drug_dataset_clean &#x3D; drug_dataset[“train”].train_test_split(train_size&#x3D;0.8, seed&#x3D;42)</p>
+<h1 id="Rename-the-default-“test”-split-to-“validation”"><a href="#Rename-the-default-“test”-split-to-“validation”" class="headerlink" title="Rename the default “test” split to “validation”"></a>Rename the default “test” split to “validation”</h1><p>drug_dataset_clean[“validation”] &#x3D; drug_dataset_clean.pop(“test”)</p>
+<h1 id="Add-the-“test”-set-to-our-DatasetDict"><a href="#Add-the-“test”-set-to-our-DatasetDict" class="headerlink" title="Add the “test” set to our DatasetDict"></a>Add the “test” set to our <code>DatasetDict</code></h1><p>drug_dataset_clean[“test”] &#x3D; drug_dataset[“test”]<br>drug_dataset_clean</p>
+<p>‘’’<br>DatasetDict({<br>    train: Dataset({<br>        features: [‘patient_id’, ‘drugName’, ‘condition’, ‘review’, ‘rating’, ‘date’, ‘usefulCount’, ‘review_length’, ‘review_clean’],<br>        num_rows: 110811<br>    })<br>    validation: Dataset({<br>        features: [‘patient_id’, ‘drugName’, ‘condition’, ‘review’, ‘rating’, ‘date’, ‘usefulCount’, ‘review_length’, ‘review_clean’],<br>        num_rows: 27703<br>    })<br>    test: Dataset({<br>        features: [‘patient_id’, ‘drugName’, ‘condition’, ‘review’, ‘rating’, ‘date’, ‘usefulCount’, ‘review_length’, ‘review_clean’],<br>        num_rows: 46108<br>    })<br>})’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 保存文件</span><br><span class="line"></span><br><span class="line">| Data format | Function                 |</span><br><span class="line">| ----------- | ------------------------ |</span><br><span class="line">| Arrow       | `Dataset.save_to_disk()` |</span><br><span class="line">| CSV         | `Dataset.to_csv()`       |</span><br><span class="line">| JSON        | `Dataset.to_json()`      |</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 对超大数据的处理</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## psutil 查看内存</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>!pip install psutil</p>
+<p>import psutil</p>
+<h1 id="Process-memory-info-is-expressed-in-bytes-so-convert-to-megabytes"><a href="#Process-memory-info-is-expressed-in-bytes-so-convert-to-megabytes" class="headerlink" title="Process.memory_info is expressed in bytes, so convert to megabytes"></a>Process.memory_info is expressed in bytes, so convert to megabytes</h1><p>print(f”RAM used: {psutil.Process().memory_info().rss &#x2F; (1024 * 1024):.2f} MB”)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">If you’re familiar with Pandas, this result might come as a surprise because of Wes Kinney’s famous [rule of thumb](https://wesmckinney.com/blog/apache-arrow-pandas-internals/) that you typically `need 5 to 10 times as much RAM as the size of your dataset`. So how does 🤗 Datasets solve this memory management problem? 🤗 Datasets treats each dataset as a [memory-mapped file](https://en.wikipedia.org/wiki/Memory-mapped_file), which provides a mapping between RAM and filesystem storage that allows the library to access and operate on elements of the dataset without needing to fully load it into memory.</span><br><span class="line"></span><br><span class="line">Memory-mapped files can also be shared across multiple processes, which enables methods like `Dataset.map()` to be parallelized without needing to move or copy the dataset. Under the hood, these capabilities are all realized by the [Apache Arrow](https://arrow.apache.org/) memory format and [`pyarrow`](https://arrow.apache.org/docs/python/index.html) library, which make the data loading and processing lightning fast.</span><br><span class="line"></span><br><span class="line">通常你需要五到十倍于你文件大小的内存，而dataset的内存管理使得你可以加载巨大的数据集的一部分，这是通过pyarrow实现的，并且你的map方法可并行处理数据。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## stream data</span><br><span class="line"></span><br><span class="line"> if we tried to download the Pile in its entirety, we’d need` 825 GB `of free disk space! To handle these cases, 🤗 Datasets provides a streaming feature that allows us to download and access elements on the fly, without needing to download the whole dataset. Let’s take a look at how this works.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>pubmed_dataset_streamed &#x3D; load_dataset(<br>    “json”, data_files&#x3D;data_files, split&#x3D;”train”, streaming&#x3D;True<br>)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">返回的是一个`IterableDataset`对象</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>from transformers import AutoTokenizer</p>
+<p>tokenizer &#x3D; AutoTokenizer.from_pretrained(“distilbert-base-uncased”)<br>tokenized_dataset &#x3D; pubmed_dataset_streamed.map(lambda x: tokenizer(x[“text”]))<br>next(iter(tokenized_dataset))<br>‘’’<br>{‘input_ids’: [101, 4958, 5178, 4328, 6779, …], ‘attention_mask’: [1, 1, 1, 1, 1, …]}’’’</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&gt; 💡 To speed up tokenization with streaming you can pass `batched=True`, as we saw in the last section. It will process the examples batch by batch; the default batch size is 1,000 and can be specified with the `batch_size` argument.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## 合并数据集</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">🤗 Datasets provides an `interleave_datasets()` function that converts a list of `IterableDataset` objects into a single `IterableDataset`, where the elements of the new dataset are obtained by alternating among the source examples. </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>law_dataset_streamed &#x3D; load_dataset(<br>    “json”,<br>    data_files&#x3D;”<a target="_blank" rel="noopener" href="https://the-eye.eu/public/AI/pile_preliminary_components/FreeLaw_Opinions.jsonl.zst&quot;">https://the-eye.eu/public/AI/pile_preliminary_components/FreeLaw_Opinions.jsonl.zst&quot;</a>,<br>    split&#x3D;”train”,<br>    streaming&#x3D;True,<br>)<br>next(iter(law_dataset_streamed))<br>‘’’<br>{‘meta’: {‘case_ID’: ‘110921.json’,<br>  ‘case_jurisdiction’: ‘scotus.tar.gz’,<br>  ‘date_created’: ‘2010-04-28T17:12:49Z’},<br> ‘text’: ‘\n461 U.S. 238 (1983)\nOLIM ET AL.\nv.\nWAKINEKONA\nNo. 81-1581.\nSupreme Court of United States.\nArgued January 19, 1983.\nDecided April 26, 1983.\nCERTIORARI TO THE UNITED STATES COURT OF APPEALS FOR THE NINTH CIRCUIT\n*239 Michael A. Lilly, First Deputy Attorney General of Hawaii, argued the cause for petitioners. With him on the brief was James H. Dannenberg, Deputy Attorney General…’}’’’</p>
+<pre><code>
+
+
+
+</code></pre>
+</article><div class="post-copyright"><div class="post-copyright__title"><span class="post-copyright-info"><h>HF Course 04 Dataset</h></span></div><div class="post-copyright__type"><span class="post-copyright-info"><a href="https://poyone.github.io/posts/4498.html">https://poyone.github.io/posts/4498.html</a></span></div><div class="post-copyright-m"><div class="post-copyright-m-info"><div class="post-copyright-a"><h>作者</h><div class="post-copyright-cc-info"><h>Poy One</h></div></div><div class="post-copyright-c"><h>发布于</h><div class="post-copyright-cc-info"><h>2022-12-11</h></div></div><div class="post-copyright-u"><h>更新于</h><div class="post-copyright-cc-info"><h>2022-12-12</h></div></div><div class="post-copyright-c"><h>许可协议</h><div class="post-copyright-cc-info"><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a rel="noopener" target="_blank" title="CC BY-NC-SA 4.0" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></div></div></div></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Huggingface/">Huggingface</a></div><div class="post_share"><div class="social-share" data-image="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/5596.html"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HF Course 05 faiss 搜索引擎</div></div></a></div><div class="next-post pull-right"><a href="/posts/18130.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">HF Course 03 微调范式</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/58033.html" title="NLP Baseline 01 翻译"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-05</div><div class="title">NLP Baseline 01 翻译</div></div></a></div><div><a href="/posts/16149.html" title="HF Course 01 基础概念"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 01 基础概念</div></div></a></div><div><a href="/posts/64185.html" title="HF Course 02 API概要"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 02 API概要</div></div></a></div><div><a href="/posts/18130.html" title="HF Course 03 微调范式"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 03 微调范式</div></div></a></div><div><a href="/posts/5596.html" title="HF Course 05 faiss 搜索引擎"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 05 faiss 搜索引擎</div></div></a></div><div><a href="/posts/55913.html" title="HF Course 06 继承式的Tokenizer"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 06 继承式的Tokenizer</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Poy One</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/poyone"><i></i><span>🛴前往github...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/poyone" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:poyone1222@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客 <br> QQ 914987163</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E6%9C%AC%E5%9C%B0%E6%95%B0%E6%8D%AE"><span class="toc-text">加载本地数据</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#data-files%E5%8F%82%E6%95%B0"><span class="toc-text">data_files参数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#t-is-the-tab-character-in-Python"><span class="toc-text">\t is the tab character in Python</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Peek-at-the-first-few-examples"><span class="toc-text">Peek at the first few examples</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Check-that-lowercasing-worked"><span class="toc-text">Check that lowercasing worked</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Inspect-the-first-training-example"><span class="toc-text">Inspect the first training example</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#128-49"><span class="toc-text">[128, 49]</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Rename-the-default-%E2%80%9Ctest%E2%80%9D-split-to-%E2%80%9Cvalidation%E2%80%9D"><span class="toc-text">Rename the default “test” split to “validation”</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Add-the-%E2%80%9Ctest%E2%80%9D-set-to-our-DatasetDict"><span class="toc-text">Add the “test” set to our DatasetDict</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Process-memory-info-is-expressed-in-bytes-so-convert-to-megabytes"><span class="toc-text">Process.memory_info is expressed in bytes, so convert to megabytes</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By Poy One</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer src="/js/light.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show","#web_bg",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka15.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CV/&quot;);" href="javascript:void(0);">CV</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">计算机视觉</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka22.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/NLP/&quot;);" href="javascript:void(0);">NLP</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">自然语言处理</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka10.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Trick/&quot;);" href="javascript:void(0);">Trick</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">import torch as tf</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka29.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Dive-Into-Paper/&quot;);" href="javascript:void(0);">Dive Into Paper</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">论文精读</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka16.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Python/&quot;);" href="javascript:void(0);">Python</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">流畅的Python</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka32.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Universe/&quot;);" href="javascript:void(0);">Universe</a><span class="categoryBar-list-count">14</span><span class="categoryBar-list-descr">拥有一切 却变成太空</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><!-- hexo injector body_end end --></body></html>

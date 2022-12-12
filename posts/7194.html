@@ -1,0 +1,394 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>HF Course 09 Custom Tokenizer | Attention Is A Talent</title><meta name="author" content="Poy One"><meta name="copyright" content="Poy One"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="与之前继承式的分词器不同，这词我们将从语料库中训练一个全新的分词器 首先我们设置一个WordPiece类型的分词器  加载文档12345678910111213from datasets import load_datasetdataset &#x3D; load_dataset(&quot;wikitext&quot;, name&#x3D;&quot;wikitext-2-raw-v1&quot;, split">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HF Course 09 Custom Tokenizer">
+<meta property="og:url" content="https://poyone.github.io/posts/7194.html">
+<meta property="og:site_name" content="Attention Is A Talent">
+<meta property="og:description" content="与之前继承式的分词器不同，这词我们将从语料库中训练一个全新的分词器 首先我们设置一个WordPiece类型的分词器  加载文档12345678910111213from datasets import load_datasetdataset &#x3D; load_dataset(&quot;wikitext&quot;, name&#x3D;&quot;wikitext-2-raw-v1&quot;, split">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp">
+<meta property="article:published_time" content="2022-12-12T08:15:06.518Z">
+<meta property="article:modified_time" content="2022-12-12T09:30:53.736Z">
+<meta property="article:author" content="Poy One">
+<meta property="article:tag" content="Huggingface">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp"><link rel="shortcut icon" href="https://npm.elemecdn.com/poyone1222/eris/eris11.webp"><link rel="canonical" href="https://poyone.github.io/posts/7194"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HF Course 09 Custom Tokenizer',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-12 17:30:53'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://npm.elemecdn.com/poyone1222/eris/Eris11.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Attention Is A Talent</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HF Course 09 Custom Tokenizer</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-12T08:15:06.518Z" title="发表于 2022-12-12 16:15:06">2022-12-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-12T09:30:53.736Z" title="更新于 2022-12-12 17:30:53">2022-12-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Universe/">Universe</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HF Course 09 Custom Tokenizer"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>与之前继承式的分词器不同，这词我们将从语料库中训练一个全新的分词器</p>
+<p>首先我们设置一个WordPiece类型的分词器</p>
+</blockquote>
+<h1 id="加载文档"><a href="#加载文档" class="headerlink" title="加载文档"></a>加载文档</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from datasets import load_dataset</span><br><span class="line"></span><br><span class="line">dataset = load_dataset(&quot;wikitext&quot;, name=&quot;wikitext-2-raw-v1&quot;, split=&quot;train&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get_training_corpus():</span><br><span class="line">    for i in range(0, len(dataset), 1000):</span><br><span class="line">        yield dataset[i : i + 1000][&quot;text&quot;]</span><br><span class="line"></span><br><span class="line"># 也可以从本地打开文档</span><br><span class="line">with open(&quot;wikitext-2.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</span><br><span class="line">    for i in range(len(dataset)):</span><br><span class="line">        f.write(dataset[i][&quot;text&quot;] + &quot;\n&quot;)</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="加载构件"><a href="#加载构件" class="headerlink" title="加载构件"></a>加载构件</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from tokenizers import (</span><br><span class="line">    decoders,</span><br><span class="line">    models,</span><br><span class="line">    normalizers,</span><br><span class="line">    pre_tokenizers,</span><br><span class="line">    processors,</span><br><span class="line">    trainers,</span><br><span class="line">    Tokenizer,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">tokenizer = Tokenizer(models.WordPiece(unk_token=&quot;[UNK]&quot;))</span><br></pre></td></tr></table></figure>
+
+<p>我们从<code>tokenizer库</code>中加载特殊的<code>model</code>构件，来使用<code>WordPiece</code>方法</p>
+<p>设定遇到没见过的词标记为[UNK]， 同时可以设置<code>max_input_chars_per_word</code>作为最大词长</p>
+<h2 id="设置Normalizer"><a href="#设置Normalizer" class="headerlink" title="设置Normalizer"></a>设置Normalizer</h2><p>这里我们选择bert的设置，包括: </p>
+<p>所有字母小写、strip_accents除去重音、删除控制字符、将所有多个空格设置为单个空格、汉字周围放置空格。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.normalizer = normalizers.BertNormalizer(lowercase=True)</span><br><span class="line"></span><br><span class="line"># 你也可以自定义</span><br><span class="line">tokenizer.normalizer = normalizers.Sequence(</span><br><span class="line">    [normalizers.NFD(), normalizers.Lowercase(), normalizers.StripAccents()]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(tokenizer.normalizer.normalize_str(&quot;Héllò hôw are ü?&quot;))</span><br><span class="line"># hello how are u?</span><br></pre></td></tr></table></figure>
+
+<p>上面自定义中我们使用<code>Sequence</code>方法定义我们自己的规范化规则</p>
+<h2 id="Pre-tokenization"><a href="#Pre-tokenization" class="headerlink" title="Pre-tokenization"></a>Pre-tokenization</h2><p>和上面一样可以通过<code>tokenizer.pre_tokenizer = pre_tokenizers.BertPreTokenizer()</code>套用bert的设置</p>
+<p>下面是custom版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.pre_tokenizer = pre_tokenizers.Whitespace()</span><br><span class="line">tokenizer.pre_tokenizer.pre_tokenize_str(&quot;Let&#x27;s test my pre-tokenizer.&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[(&#x27;Let&#x27;, (0, 3)), (&quot;&#x27;&quot;, (3, 4)), (&#x27;s&#x27;, (4, 5)), (&#x27;test&#x27;, (6, 10)), (&#x27;my&#x27;, (11, 13)), (&#x27;pre&#x27;, (14, 17)),</span><br><span class="line"> (&#x27;-&#x27;, (17, 18)), (&#x27;tokenizer&#x27;, (18, 27)), (&#x27;.&#x27;, (27, 28))]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>.Whitespace()</code>是对标点空格分隔，你可用下面的分隔</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pre_tokenizer = pre_tokenizers.WhitespaceSplit()</span><br><span class="line">pre_tokenizer.pre_tokenize_str(&quot;Let&#x27;s test my pre-tokenizer.&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[(&quot;Let&#x27;s&quot;, (0, 5)), (&#x27;test&#x27;, (6, 10)), (&#x27;my&#x27;, (11, 13)), (&#x27;pre-tokenizer.&#x27;, (14, 28))]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>推荐使用Sequence方法组合你的预分词</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pre_tokenizer = pre_tokenizers.Sequence(</span><br><span class="line">    [pre_tokenizers.WhitespaceSplit(), pre_tokenizers.Punctuation()]</span><br><span class="line">)</span><br><span class="line">pre_tokenizer.pre_tokenize_str(&quot;Let&#x27;s test my pre-tokenizer.&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[(&#x27;Let&#x27;, (0, 3)), (&quot;&#x27;&quot;, (3, 4)), (&#x27;s&#x27;, (4, 5)), (&#x27;test&#x27;, (6, 10)), (&#x27;my&#x27;, (11, 13)), (&#x27;pre&#x27;, (14, 17)),</span><br><span class="line"> (&#x27;-&#x27;, (17, 18)), (&#x27;tokenizer&#x27;, (18, 27)), (&#x27;.&#x27;, (27, 28))]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Trainer"><a href="#Trainer" class="headerlink" title="Trainer"></a>Trainer</h2><p>训练之前我们需要加入特殊token因为他不在你的词库之中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">special_tokens = [&quot;[UNK]&quot;, &quot;[PAD]&quot;, &quot;[CLS]&quot;, &quot;[SEP]&quot;, &quot;[MASK]&quot;]</span><br><span class="line">trainer = trainers.WordPieceTrainer(vocab_size=25000, special_tokens=special_tokens)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>As well as specifying the <code>vocab_size</code> and <code>special_tokens</code>, we can set the <code>min_frequency</code> (the number of times a token must appear to be included in the vocabulary) or change the <code>continuing_subword_prefix</code> (if we want to use something different from <code>##</code>).<ul>
+<li>改某个token必须出现多少次、改连接前缀##为别的</li>
+</ul>
+</li>
+</ul>
+<p>开始训练</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.train_from_iterator(get_training_corpus(), trainer=trainer)</span><br><span class="line"></span><br><span class="line"># 另外的版本</span><br><span class="line">tokenizer.model = models.WordPiece(unk_token=&quot;[UNK]&quot;)</span><br><span class="line">tokenizer.train([&quot;wikitext-2.txt&quot;], trainer=trainer)</span><br></pre></td></tr></table></figure>
+
+<p>第一种方法是用上面定义的生成器</p>
+<p>第二种传入”wikitext-2.txt”文件</p>
+<p>到此我们tokenizer就具有了一般tokenizer的所有方法如<code>encode</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer.&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line"></span><br><span class="line"># [&#x27;let&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;test&#x27;, &#x27;this&#x27;, &#x27;tok&#x27;, &#x27;##eni&#x27;, &#x27;##zer&#x27;, &#x27;.&#x27;]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Post-processing"><a href="#Post-processing" class="headerlink" title="Post-processing"></a>Post-processing</h2><p>最后我们需要包裹我们的token到特殊的格式如: [CLS]…[SEP]…[SEP]</p>
+<p>首先我们获取所需的特殊token的下标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cls_token_id = tokenizer.token_to_id(&quot;[CLS]&quot;)</span><br><span class="line">sep_token_id = tokenizer.token_to_id(&quot;[SEP]&quot;)</span><br><span class="line">print(cls_token_id, sep_token_id)</span><br><span class="line"></span><br><span class="line"># (2, 3)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>接下来处理我们的模板</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.post_processor = processors.TemplateProcessing(</span><br><span class="line">    single=f&quot;[CLS]:0 $A:0 [SEP]:0&quot;,</span><br><span class="line">    pair=f&quot;[CLS]:0 $A:0 [SEP]:0 $B:1 [SEP]:1&quot;,</span><br><span class="line">    special_tokens=[(&quot;[CLS]&quot;, cls_token_id), (&quot;[SEP]&quot;, sep_token_id)],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>模板我们需要设置两种模式:</p>
+<ul>
+<li><p>single–单个句子情况下</p>
+<ul>
+<li>[0,0,0,0]</li>
+</ul>
+</li>
+<li><p>pair</p>
+<ul>
+<li>[0,0,0,1,1,1]</li>
+</ul>
+</li>
+<li><p>最后指定特殊token的id</p>
+</li>
+</ul>
+<p>查看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer.&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line"># [&#x27;[CLS]&#x27;, &#x27;let&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;test&#x27;, &#x27;this&#x27;, &#x27;tok&#x27;, &#x27;##eni&#x27;, &#x27;##zer&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]</span><br><span class="line"></span><br><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer...&quot;, &quot;on a pair of sentences.&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line">print(encoding.type_ids)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#x27;[CLS]&#x27;, &#x27;let&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;test&#x27;, &#x27;this&#x27;, &#x27;tok&#x27;, &#x27;##eni&#x27;, &#x27;##zer&#x27;, &#x27;...&#x27;, &#x27;[SEP]&#x27;, &#x27;on&#x27;, &#x27;a&#x27;, &#x27;pair&#x27;, &#x27;of&#x27;, &#x27;sentences&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]</span><br><span class="line">[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="decoder"><a href="#decoder" class="headerlink" title="decoder"></a>decoder</h2><p>接下来对解码器做一定设置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.decoder = decoders.WordPiece(prefix=&quot;##&quot;)</span><br><span class="line"></span><br><span class="line">tokenizer.decode(encoding.ids)</span><br><span class="line"># &quot;let&#x27;s test this tokenizer... on a pair of sentences.&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="保存-amp-加载-Custom-Tokenizer"><a href="#保存-amp-加载-Custom-Tokenizer" class="headerlink" title="保存 &amp; 加载 Custom Tokenizer"></a>保存 &amp; 加载 Custom Tokenizer</h2><p><code>tokenizer.save(&quot;tokenizer.json&quot;)</code></p>
+<p><code>new_tokenizer = Tokenizer.from_file(&quot;tokenizer.json&quot;)</code></p>
+<h1 id="转成Fast-Tokenizer"><a href="#转成Fast-Tokenizer" class="headerlink" title="转成Fast Tokenizer"></a>转成Fast Tokenizer</h1><p>To use this tokenizer in 🤗 Transformers, we have to wrap it in a <code>PreTrainedTokenizerFast</code>. We can either use the generic class or, if our tokenizer corresponds to an existing model, use that class (here, <code>BertTokenizerFast</code>). If you apply this lesson to build a brand new tokenizer, you will have to use the first option.</p>
+<ul>
+<li>可以继承你的特定类<code>BertTokenizerFast</code>，也可以用泛类<code>PreTrainedTokenizerFast</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from transformers import PreTrainedTokenizerFast</span><br><span class="line"></span><br><span class="line">wrapped_tokenizer = PreTrainedTokenizerFast(</span><br><span class="line">    tokenizer_object=tokenizer,</span><br><span class="line">    # tokenizer_file=&quot;tokenizer.json&quot;, # You can load from the tokenizer file, alternatively</span><br><span class="line">    unk_token=&quot;[UNK]&quot;,</span><br><span class="line">    pad_token=&quot;[PAD]&quot;,</span><br><span class="line">    cls_token=&quot;[CLS]&quot;,</span><br><span class="line">    sep_token=&quot;[SEP]&quot;,</span><br><span class="line">    mask_token=&quot;[MASK]&quot;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这里可以从文件中加载你的tokenizer设置、也可直接赋值、注意你的<code>特殊符号必须重新定义</code></p>
+<h1 id="BPE类型的分词器"><a href="#BPE类型的分词器" class="headerlink" title="BPE类型的分词器"></a>BPE类型的分词器</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tokenizer = Tokenizer(models.BPE())</span><br><span class="line">tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)</span><br><span class="line"></span><br><span class="line">tokenizer.pre_tokenizer.pre_tokenize_str(&quot;Let&#x27;s test pre-tokenization!&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[(&#x27;Let&#x27;, (0, 3)), (&quot;&#x27;s&quot;, (3, 5)), (&#x27;Ġtest&#x27;, (5, 10)), (&#x27;Ġpre&#x27;, (10, 14)), (&#x27;-&#x27;, (14, 15)),</span><br><span class="line"> (&#x27;tokenization&#x27;, (15, 27)), (&#x27;!&#x27;, (27, 28))]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>GPT2只需要开始和结束的特殊token</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">trainer = trainers.BpeTrainer(vocab_size=25000, special_tokens=[&quot;&lt;|endoftext|&gt;&quot;])</span><br><span class="line">tokenizer.train_from_iterator(get_training_corpus(), trainer=trainer)</span><br><span class="line"></span><br><span class="line">tokenizer.model = models.BPE()</span><br><span class="line">tokenizer.train([&quot;wikitext-2.txt&quot;], trainer=trainer)</span><br><span class="line"></span><br><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer.&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#x27;L&#x27;, &#x27;et&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;Ġtest&#x27;, &#x27;Ġthis&#x27;, &#x27;Ġto&#x27;, &#x27;ken&#x27;, &#x27;izer&#x27;, &#x27;.&#x27;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.post_processor = processors.ByteLevel(trim_offsets=False)</span><br><span class="line"></span><br><span class="line">sentence = &quot;Let&#x27;s test this tokenizer.&quot;</span><br><span class="line">encoding = tokenizer.encode(sentence)</span><br><span class="line">start, end = encoding.offsets[4]</span><br><span class="line">sentence[start:end]</span><br><span class="line"></span><br><span class="line"># &#x27; test&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>The <code>trim_offsets = False</code> option indicates to the post-processor that we should leave the offsets of tokens that begin with ‘Ġ’ as they are: this way the start of the offsets will point to the space before the word, not the first character of the word (since the space is technically part of the token). Let’s have a look at the result with the text we just encoded, where <code>&#39;Ġtest&#39;</code> is the token at index 4</p>
+<ul>
+<li><code>trim_offsets</code>设定是否修正字符的空格位置进入偏移量</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.decoder = decoders.ByteLevel()</span><br><span class="line">tokenizer.decode(encoding.ids)</span><br><span class="line"># &quot;Let&#x27;s test this tokenizer.&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>包装</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from transformers import PreTrainedTokenizerFast</span><br><span class="line"></span><br><span class="line">wrapped_tokenizer = PreTrainedTokenizerFast(</span><br><span class="line">    tokenizer_object=tokenizer,</span><br><span class="line">    bos_token=&quot;&lt;|endoftext|&gt;&quot;,</span><br><span class="line">    eos_token=&quot;&lt;|endoftext|&gt;&quot;,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"># 或者</span><br><span class="line">from transformers import GPT2TokenizerFast</span><br><span class="line"></span><br><span class="line">wrapped_tokenizer = GPT2TokenizerFast(tokenizer_object=tokenizer)</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Unigram类型的分词器"><a href="#Unigram类型的分词器" class="headerlink" title="Unigram类型的分词器"></a>Unigram类型的分词器</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">tokenizer = Tokenizer(models.Unigram())</span><br><span class="line"></span><br><span class="line">from tokenizers import Regex</span><br><span class="line"></span><br><span class="line">tokenizer.normalizer = normalizers.Sequence(</span><br><span class="line">    [</span><br><span class="line">        normalizers.Replace(&quot;``&quot;, &#x27;&quot;&#x27;),</span><br><span class="line">        normalizers.Replace(&quot;&#x27;&#x27;&quot;, &#x27;&quot;&#x27;),</span><br><span class="line">        normalizers.NFKD(),</span><br><span class="line">        normalizers.StripAccents(),</span><br><span class="line">        normalizers.Replace(Regex(&quot; &#123;2,&#125;&quot;), &quot; &quot;),</span><br><span class="line">    ]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>第一、二个norm将符号替换，最后一个将多个空格替换成一个</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.pre_tokenizer = pre_tokenizers.Metaspace()</span><br><span class="line">tokenizer.pre_tokenizer.pre_tokenize_str(&quot;Let&#x27;s test the pre-tokenizer!&quot;)</span><br><span class="line"></span><br><span class="line"># [(&quot;▁Let&#x27;s&quot;, (0, 5)), (&#x27;▁test&#x27;, (5, 10)), (&#x27;▁the&#x27;, (10, 14)), (&#x27;▁pre-tokenizer!&#x27;, (14, 29))]</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">special_tokens = [&quot;&lt;cls&gt;&quot;, &quot;&lt;sep&gt;&quot;, &quot;&lt;unk&gt;&quot;, &quot;&lt;pad&gt;&quot;, &quot;&lt;mask&gt;&quot;, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;]</span><br><span class="line">trainer = trainers.UnigramTrainer(</span><br><span class="line">    vocab_size=25000, special_tokens=special_tokens, unk_token=&quot;&lt;unk&gt;&quot;</span><br><span class="line">)</span><br><span class="line">tokenizer.train_from_iterator(get_training_corpus(), trainer=trainer)</span><br><span class="line"></span><br><span class="line"># 或者</span><br><span class="line">tokenizer.model = models.Unigram()</span><br><span class="line">tokenizer.train([&quot;wikitext-2.txt&quot;], trainer=trainer)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer.&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#x27;▁Let&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;▁test&#x27;, &#x27;▁this&#x27;, &#x27;▁to&#x27;, &#x27;ken&#x27;, &#x27;izer&#x27;, &#x27;.&#x27;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">cls_token_id = tokenizer.token_to_id(&quot;&lt;cls&gt;&quot;)</span><br><span class="line">sep_token_id = tokenizer.token_to_id(&quot;&lt;sep&gt;&quot;)</span><br><span class="line">print(cls_token_id, sep_token_id)</span><br><span class="line"># 0 1</span><br><span class="line"></span><br><span class="line">tokenizer.post_processor = processors.TemplateProcessing(</span><br><span class="line">    single=&quot;$A:0 &lt;sep&gt;:0 &lt;cls&gt;:2&quot;,</span><br><span class="line">    pair=&quot;$A:0 &lt;sep&gt;:0 $B:1 &lt;sep&gt;:1 &lt;cls&gt;:2&quot;,</span><br><span class="line">    special_tokens=[(&quot;&lt;sep&gt;&quot;, sep_token_id), (&quot;&lt;cls&gt;&quot;, cls_token_id)],</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">encoding = tokenizer.encode(&quot;Let&#x27;s test this tokenizer...&quot;, &quot;on a pair of sentences!&quot;)</span><br><span class="line">print(encoding.tokens)</span><br><span class="line">print(encoding.type_ids)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#x27;▁Let&#x27;, &quot;&#x27;&quot;, &#x27;s&#x27;, &#x27;▁test&#x27;, &#x27;▁this&#x27;, &#x27;▁to&#x27;, &#x27;ken&#x27;, &#x27;izer&#x27;, &#x27;.&#x27;, &#x27;.&#x27;, &#x27;.&#x27;, &#x27;&lt;sep&gt;&#x27;, &#x27;▁&#x27;, &#x27;on&#x27;, &#x27;▁&#x27;, &#x27;a&#x27;, &#x27;▁pair&#x27;, </span><br><span class="line">  &#x27;▁of&#x27;, &#x27;▁sentence&#x27;, &#x27;s&#x27;, &#x27;!&#x27;, &#x27;&lt;sep&gt;&#x27;, &#x27;&lt;cls&gt;&#x27;]</span><br><span class="line">[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>XLnet填充pad在左边且[CLS]在最后，这些我们都需要指明给Fast</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from transformers import PreTrainedTokenizerFast</span><br><span class="line"></span><br><span class="line">wrapped_tokenizer = PreTrainedTokenizerFast(</span><br><span class="line">    tokenizer_object=tokenizer,</span><br><span class="line">    bos_token=&quot;&lt;s&gt;&quot;,</span><br><span class="line">    eos_token=&quot;&lt;/s&gt;&quot;,</span><br><span class="line">    unk_token=&quot;&lt;unk&gt;&quot;,</span><br><span class="line">    pad_token=&quot;&lt;pad&gt;&quot;,</span><br><span class="line">    cls_token=&quot;&lt;cls&gt;&quot;,</span><br><span class="line">    sep_token=&quot;&lt;sep&gt;&quot;,</span><br><span class="line">    mask_token=&quot;&lt;mask&gt;&quot;,</span><br><span class="line">    padding_side=&quot;left&quot;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">from transformers import XLNetTokenizerFast</span><br><span class="line"></span><br><span class="line">wrapped_tokenizer = XLNetTokenizerFast(tokenizer_object=tokenizer)</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__title"><span class="post-copyright-info"><h>HF Course 09 Custom Tokenizer</h></span></div><div class="post-copyright__type"><span class="post-copyright-info"><a href="https://poyone.github.io/posts/7194.html">https://poyone.github.io/posts/7194.html</a></span></div><div class="post-copyright-m"><div class="post-copyright-m-info"><div class="post-copyright-a"><h>作者</h><div class="post-copyright-cc-info"><h>Poy One</h></div></div><div class="post-copyright-c"><h>发布于</h><div class="post-copyright-cc-info"><h>2022-12-12</h></div></div><div class="post-copyright-u"><h>更新于</h><div class="post-copyright-cc-info"><h>2022-12-12</h></div></div><div class="post-copyright-c"><h>许可协议</h><div class="post-copyright-cc-info"><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a rel="noopener" target="_blank" title="CC BY-NC-SA 4.0" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></div></div></div></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Huggingface/">Huggingface</a></div><div class="post_share"><div class="social-share" data-image="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/posts/7193.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">HF Course 08 Tokenizer底层算法</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/58033.html" title="NLP Baseline 01 翻译"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-05</div><div class="title">NLP Baseline 01 翻译</div></div></a></div><div><a href="/posts/16149.html" title="HF Course 01 基础概念"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 01 基础概念</div></div></a></div><div><a href="/posts/64185.html" title="HF Course 02 API概要"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 02 API概要</div></div></a></div><div><a href="/posts/18130.html" title="HF Course 03 微调范式"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 03 微调范式</div></div></a></div><div><a href="/posts/4498.html" title="HF Course 04 Dataset"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 04 Dataset</div></div></a></div><div><a href="/posts/5596.html" title="HF Course 05 faiss 搜索引擎"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 05 faiss 搜索引擎</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Poy One</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/poyone"><i></i><span>🛴前往github...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/poyone" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:poyone1222@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客 <br> QQ 914987163</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E6%96%87%E6%A1%A3"><span class="toc-text">加载文档</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E8%BD%BD%E6%9E%84%E4%BB%B6"><span class="toc-text">加载构件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AENormalizer"><span class="toc-text">设置Normalizer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pre-tokenization"><span class="toc-text">Pre-tokenization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Trainer"><span class="toc-text">Trainer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Post-processing"><span class="toc-text">Post-processing</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#decoder"><span class="toc-text">decoder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%9D%E5%AD%98-amp-%E5%8A%A0%E8%BD%BD-Custom-Tokenizer"><span class="toc-text">保存 &amp; 加载 Custom Tokenizer</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AC%E6%88%90Fast-Tokenizer"><span class="toc-text">转成Fast Tokenizer</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#BPE%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%88%86%E8%AF%8D%E5%99%A8"><span class="toc-text">BPE类型的分词器</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Unigram%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%88%86%E8%AF%8D%E5%99%A8"><span class="toc-text">Unigram类型的分词器</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By Poy One</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer src="/js/light.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show","#web_bg",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka15.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CV/&quot;);" href="javascript:void(0);">CV</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">计算机视觉</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka22.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/NLP/&quot;);" href="javascript:void(0);">NLP</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">自然语言处理</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka10.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Trick/&quot;);" href="javascript:void(0);">Trick</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">import torch as tf</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka29.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Dive-Into-Paper/&quot;);" href="javascript:void(0);">Dive Into Paper</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">论文精读</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka16.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Python/&quot;);" href="javascript:void(0);">Python</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">流畅的Python</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka32.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Universe/&quot;);" href="javascript:void(0);">Universe</a><span class="categoryBar-list-count">14</span><span class="categoryBar-list-descr">拥有一切 却变成太空</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><!-- hexo injector body_end end --></body></html>

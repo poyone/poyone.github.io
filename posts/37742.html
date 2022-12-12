@@ -1,0 +1,402 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>HF Course 07 NER QA Tokenizer | Attention Is A Talent</title><meta name="author" content="Poy One"><meta name="copyright" content="Poy One"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="记得排版 分割线待完成 QA部分   本章我们需要对做特殊的tokenizer以适应NER和QA任务数据的特殊性  Fast Tokenizer1234567from transformers import AutoTokenizertokenizer &#x3D; AutoTokenizer.from_pretrained(&quot;bert-base-cased&quot;)example &#x3D; &amp;qu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HF Course 07 NER QA Tokenizer">
+<meta property="og:url" content="https://poyone.github.io/posts/37742.html">
+<meta property="og:site_name" content="Attention Is A Talent">
+<meta property="og:description" content="记得排版 分割线待完成 QA部分   本章我们需要对做特殊的tokenizer以适应NER和QA任务数据的特殊性  Fast Tokenizer1234567from transformers import AutoTokenizertokenizer &#x3D; AutoTokenizer.from_pretrained(&quot;bert-base-cased&quot;)example &#x3D; &amp;qu">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp">
+<meta property="article:published_time" content="2022-12-11T14:53:10.235Z">
+<meta property="article:modified_time" content="2022-12-12T04:09:35.967Z">
+<meta property="article:author" content="Poy One">
+<meta property="article:tag" content="Huggingface">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp"><link rel="shortcut icon" href="https://npm.elemecdn.com/poyone1222/eris/eris11.webp"><link rel="canonical" href="https://poyone.github.io/posts/37742"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HF Course 07 NER QA Tokenizer',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-12 12:09:35'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://npm.elemecdn.com/poyone1222/eris/Eris11.webp')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Attention Is A Talent</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HF Course 07 NER QA Tokenizer</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-11T14:53:10.235Z" title="发表于 2022-12-11 22:53:10">2022-12-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-12T04:09:35.967Z" title="更新于 2022-12-12 12:09:35">2022-12-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Universe/">Universe</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>20分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HF Course 07 NER QA Tokenizer"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="记得排版-分割线"><a href="#记得排版-分割线" class="headerlink" title="记得排版 分割线"></a>记得排版 分割线</h1><h1 id="待完成"><a href="#待完成" class="headerlink" title="待完成"></a>待完成</h1><ul>
+<li>QA部分</li>
+</ul>
+<blockquote>
+<p>本章我们需要对做特殊的tokenizer以适应NER和QA任务数据的特殊性</p>
+</blockquote>
+<h1 id="Fast-Tokenizer"><a href="#Fast-Tokenizer" class="headerlink" title="Fast Tokenizer"></a>Fast Tokenizer</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoTokenizer</span><br><span class="line"></span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(&quot;bert-base-cased&quot;)</span><br><span class="line">example = &quot;My name is Sylvain and I work at Hugging Face in Brooklyn.&quot;</span><br><span class="line">encoding = tokenizer(example)</span><br><span class="line">print(type(encoding))</span><br><span class="line"># &lt;class &#x27;transformers.tokenization_utils_base.BatchEncoding&#x27;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>分词后返回的结果类型不简单是字典的映射</p>
+<p>还包含很多方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.is_fast, encoding.is_fast</span><br><span class="line">(True,True)</span><br><span class="line"></span><br><span class="line">encoding.tokens()</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#x27;[CLS]&#x27;, &#x27;My&#x27;, &#x27;name&#x27;, &#x27;is&#x27;, &#x27;S&#x27;, &#x27;##yl&#x27;, &#x27;##va&#x27;, &#x27;##in&#x27;, &#x27;and&#x27;, &#x27;I&#x27;, &#x27;work&#x27;, &#x27;at&#x27;, &#x27;Hu&#x27;, &#x27;##gging&#x27;, &#x27;Face&#x27;, &#x27;in&#x27;,</span><br><span class="line"> &#x27;Brooklyn&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]&#x27;&#x27;&#x27;</span><br><span class="line"> </span><br><span class="line">encoding.word_ids()</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[None, 0, 1, 2, 3, 3, 3, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12, None]&#x27;&#x27;&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>word_ids()</code>方法可看到分词的结果来自哪个单词</p>
+<p>最后我们可以使用<code>word_to_chars()</code> or <code>token_to_chars()</code> and <code>char_to_word()</code> or <code>char_to_token()</code> 查看单词</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">start, end = encoding.word_to_chars(3)</span><br><span class="line">example[start:end]</span><br><span class="line"># Sylvain</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="NER"><a href="#NER" class="headerlink" title="NER"></a>NER</h1><blockquote>
+<p>在NER中我们以偏移量的标记来锁定原文的字符</p>
+</blockquote>
+<h2 id="pipeline方法"><a href="#pipeline方法" class="headerlink" title="pipeline方法"></a>pipeline方法</h2><p>首先查看pipeline方法的ner流程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from transformers import pipeline</span><br><span class="line"></span><br><span class="line">token_classifier = pipeline(&quot;token-classification&quot;)</span><br><span class="line">token_classifier(&quot;My name is Sylvain and I work at Hugging Face in Brooklyn.&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9993828, &#x27;index&#x27;: 4, &#x27;word&#x27;: &#x27;S&#x27;, &#x27;start&#x27;: 11, &#x27;end&#x27;: 12&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99815476, &#x27;index&#x27;: 5, &#x27;word&#x27;: &#x27;##yl&#x27;, &#x27;start&#x27;: 12, &#x27;end&#x27;: 14&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99590725, &#x27;index&#x27;: 6, &#x27;word&#x27;: &#x27;##va&#x27;, &#x27;start&#x27;: 14, &#x27;end&#x27;: 16&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9992327, &#x27;index&#x27;: 7, &#x27;word&#x27;: &#x27;##in&#x27;, &#x27;start&#x27;: 16, &#x27;end&#x27;: 18&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.97389334, &#x27;index&#x27;: 12, &#x27;word&#x27;: &#x27;Hu&#x27;, &#x27;start&#x27;: 33, &#x27;end&#x27;: 35&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.976115, &#x27;index&#x27;: 13, &#x27;word&#x27;: &#x27;##gging&#x27;, &#x27;start&#x27;: 35, &#x27;end&#x27;: 40&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.98879766, &#x27;index&#x27;: 14, &#x27;word&#x27;: &#x27;Face&#x27;, &#x27;start&#x27;: 41, &#x27;end&#x27;: 45&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-LOC&#x27;, &#x27;score&#x27;: 0.99321055, &#x27;index&#x27;: 16, &#x27;word&#x27;: &#x27;Brooklyn&#x27;, &#x27;start&#x27;: 49, &#x27;end&#x27;: 57&#125;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>简洁版</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">from transformers import pipeline</span><br><span class="line"></span><br><span class="line">token_classifier = pipeline(&quot;token-classification&quot;, aggregation_strategy=&quot;simple&quot;)</span><br><span class="line">token_classifier(&quot;My name is Sylvain and I work at Hugging Face in Brooklyn.&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#123;&#x27;entity_group&#x27;: &#x27;PER&#x27;, &#x27;score&#x27;: 0.9981694, &#x27;word&#x27;: &#x27;Sylvain&#x27;, &#x27;start&#x27;: 11, &#x27;end&#x27;: 18&#125;,</span><br><span class="line"> &#123;&#x27;entity_group&#x27;: &#x27;ORG&#x27;, &#x27;score&#x27;: 0.97960204, &#x27;word&#x27;: &#x27;Hugging Face&#x27;, &#x27;start&#x27;: 33, &#x27;end&#x27;: 45&#125;,</span><br><span class="line"> &#123;&#x27;entity_group&#x27;: &#x27;LOC&#x27;, &#x27;score&#x27;: 0.99321055, &#x27;word&#x27;: &#x27;Brooklyn&#x27;, &#x27;start&#x27;: 49, &#x27;end&#x27;: 57&#125;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>aggregation_strategy有不同的参数，simple是分词后的平均分数</p>
+<p>如上面的sylvain分数来自 正常版的四项平均<code>&#39;S&#39;, &#39;##yl&#39;, &#39;##va&#39;, &#39;##in&#39;</code></p>
+<ul>
+<li><code>&quot;first&quot;</code>, where the score of each entity is the score of the first token of that entity (so for “Sylvain” it would be 0.993828, the score of the token <code>S</code>)</li>
+<li><code>&quot;max&quot;</code>, where the score of each entity is the maximum score of the tokens in that entity (so for “Hugging Face” it would be 0.98879766, the score of “Face”)</li>
+<li><code>&quot;average&quot;</code>, where the score of each entity is the average of the scores of the words composing that entity (so for “Sylvain” there would be no difference from the <code>&quot;simple&quot;</code> strategy, but “Hugging Face” would have a score of 0.9819, the average of the scores for “Hugging”, 0.975, and “Face”, 0.98879)</li>
+</ul>
+<h2 id="logits"><a href="#logits" class="headerlink" title="logits"></a>logits</h2><p>这里通过返回的结果使用<code>argmax(-1)</code>得到映射的分类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoTokenizer, AutoModelForTokenClassification</span><br><span class="line"></span><br><span class="line">model_checkpoint = &quot;dbmdz/bert-large-cased-finetuned-conll03-english&quot;</span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)</span><br><span class="line">model = AutoModelForTokenClassification.from_pretrained(model_checkpoint)</span><br><span class="line"></span><br><span class="line">example = &quot;My name is Sylvain and I work at Hugging Face in Brooklyn.&quot;</span><br><span class="line">inputs = tokenizer(example, return_tensors=&quot;pt&quot;)</span><br><span class="line">outputs = model(**inputs)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">print(inputs[&quot;input_ids&quot;].shape)</span><br><span class="line">print(outputs.logits.shape)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">torch.Size([1, 19])</span><br><span class="line">torch.Size([1, 19, 9])&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line"></span><br><span class="line">probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)[0].tolist()</span><br><span class="line">predictions = outputs.logits.argmax(dim=-1)[0].tolist()</span><br><span class="line">print(predictions)</span><br><span class="line"># [0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0, 6, 6, 6, 0, 8, 0, 0]</span><br><span class="line"></span><br><span class="line">model.config.id2label</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;0: &#x27;O&#x27;,</span><br><span class="line"> 1: &#x27;B-MISC&#x27;,</span><br><span class="line"> 2: &#x27;I-MISC&#x27;,</span><br><span class="line"> 3: &#x27;B-PER&#x27;,</span><br><span class="line"> 4: &#x27;I-PER&#x27;,</span><br><span class="line"> 5: &#x27;B-ORG&#x27;,</span><br><span class="line"> 6: &#x27;I-ORG&#x27;,</span><br><span class="line"> 7: &#x27;B-LOC&#x27;,</span><br><span class="line"> 8: &#x27;I-LOC&#x27;&#125;&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="偏移量postprocessing"><a href="#偏移量postprocessing" class="headerlink" title="偏移量postprocessing"></a>偏移量postprocessing</h2><p>组织一下格式，复现上面的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">results = []</span><br><span class="line">tokens = inputs.tokens()</span><br><span class="line"></span><br><span class="line">for idx, pred in enumerate(predictions):</span><br><span class="line">    label = model.config.id2label[pred]</span><br><span class="line">    if label != &quot;O&quot;:</span><br><span class="line">        results.append(</span><br><span class="line">            &#123;&quot;entity&quot;: label, &quot;score&quot;: probabilities[idx][pred], &quot;word&quot;: tokens[idx]&#125;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">print(results)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9993828, &#x27;index&#x27;: 4, &#x27;word&#x27;: &#x27;S&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99815476, &#x27;index&#x27;: 5, &#x27;word&#x27;: &#x27;##yl&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99590725, &#x27;index&#x27;: 6, &#x27;word&#x27;: &#x27;##va&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9992327, &#x27;index&#x27;: 7, &#x27;word&#x27;: &#x27;##in&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.97389334, &#x27;index&#x27;: 12, &#x27;word&#x27;: &#x27;Hu&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.976115, &#x27;index&#x27;: 13, &#x27;word&#x27;: &#x27;##gging&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.98879766, &#x27;index&#x27;: 14, &#x27;word&#x27;: &#x27;Face&#x27;&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-LOC&#x27;, &#x27;score&#x27;: 0.99321055, &#x27;index&#x27;: 16, &#x27;word&#x27;: &#x27;Brooklyn&#x27;&#125;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>偏移量 offsets_mapping</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">inputs_with_offsets = tokenizer(example, return_offsets_mapping=True)</span><br><span class="line">inputs_with_offsets[&quot;offset_mapping&quot;]</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[(0, 0), (0, 2), (3, 7), (8, 10), (11, 12), (12, 14), (14, 16), (16, 18), (19, 22), (23, 24), (25, 29), (30, 32),</span><br><span class="line"> (33, 35), (35, 40), (41, 45), (46, 48), (49, 57), (57, 58), (0, 0)]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这里的19对元组就是对应19个分词后token的下标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[&#x27;[CLS]&#x27;, &#x27;My&#x27;, &#x27;name&#x27;, &#x27;is&#x27;, &#x27;S&#x27;, &#x27;##yl&#x27;, &#x27;##va&#x27;, &#x27;##in&#x27;, &#x27;and&#x27;, &#x27;I&#x27;, &#x27;work&#x27;, &#x27;at&#x27;, &#x27;Hu&#x27;, &#x27;##gging&#x27;, &#x27;Face&#x27;, &#x27;in&#x27;,&#x27;Brooklyn&#x27;, &#x27;.&#x27;, &#x27;[SEP]&#x27;]</span><br></pre></td></tr></table></figure>
+
+<p>比如(0,0)是留给[CLS]的；	比如第六个token对应的是 ##ly  那么他在原文中的标注就是（12,14），如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">example[12:14]</span><br><span class="line"># yl</span><br></pre></td></tr></table></figure>
+
+
+
+<p>继续我们的复现pipeline</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">results = []</span><br><span class="line">inputs_with_offsets = tokenizer(example, return_offsets_mapping=True)</span><br><span class="line">tokens = inputs_with_offsets.tokens()</span><br><span class="line">offsets = inputs_with_offsets[&quot;offset_mapping&quot;]</span><br><span class="line"></span><br><span class="line">for idx, pred in enumerate(predictions):</span><br><span class="line">    label = model.config.id2label[pred]</span><br><span class="line">    if label != &quot;O&quot;:</span><br><span class="line">        start, end = offsets[idx]</span><br><span class="line">        results.append(</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;entity&quot;: label,</span><br><span class="line">                &quot;score&quot;: probabilities[idx][pred],</span><br><span class="line">                &quot;word&quot;: tokens[idx],</span><br><span class="line">                &quot;start&quot;: start,</span><br><span class="line">                &quot;end&quot;: end,</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">print(results)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9993828, &#x27;index&#x27;: 4, &#x27;word&#x27;: &#x27;S&#x27;, &#x27;start&#x27;: 11, &#x27;end&#x27;: 12&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99815476, &#x27;index&#x27;: 5, &#x27;word&#x27;: &#x27;##yl&#x27;, &#x27;start&#x27;: 12, &#x27;end&#x27;: 14&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.99590725, &#x27;index&#x27;: 6, &#x27;word&#x27;: &#x27;##va&#x27;, &#x27;start&#x27;: 14, &#x27;end&#x27;: 16&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-PER&#x27;, &#x27;score&#x27;: 0.9992327, &#x27;index&#x27;: 7, &#x27;word&#x27;: &#x27;##in&#x27;, &#x27;start&#x27;: 16, &#x27;end&#x27;: 18&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.97389334, &#x27;index&#x27;: 12, &#x27;word&#x27;: &#x27;Hu&#x27;, &#x27;start&#x27;: 33, &#x27;end&#x27;: 35&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.976115, &#x27;index&#x27;: 13, &#x27;word&#x27;: &#x27;##gging&#x27;, &#x27;start&#x27;: 35, &#x27;end&#x27;: 40&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-ORG&#x27;, &#x27;score&#x27;: 0.98879766, &#x27;index&#x27;: 14, &#x27;word&#x27;: &#x27;Face&#x27;, &#x27;start&#x27;: 41, &#x27;end&#x27;: 45&#125;,</span><br><span class="line"> &#123;&#x27;entity&#x27;: &#x27;I-LOC&#x27;, &#x27;score&#x27;: 0.99321055, &#x27;index&#x27;: 16, &#x27;word&#x27;: &#x27;Brooklyn&#x27;, &#x27;start&#x27;: 49, &#x27;end&#x27;: 57&#125;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>最后对组织名处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line"></span><br><span class="line">results = []</span><br><span class="line">inputs_with_offsets = tokenizer(example, return_offsets_mapping=True)</span><br><span class="line">tokens = inputs_with_offsets.tokens()</span><br><span class="line">offsets = inputs_with_offsets[&quot;offset_mapping&quot;]</span><br><span class="line"></span><br><span class="line">idx = 0</span><br><span class="line">while idx &lt; len(predictions):</span><br><span class="line">    pred = predictions[idx]</span><br><span class="line">    label = model.config.id2label[pred]</span><br><span class="line">    if label != &quot;O&quot;:</span><br><span class="line">        # Remove the B- or I-</span><br><span class="line">        label = label[2:]</span><br><span class="line">        start, _ = offsets[idx]</span><br><span class="line"></span><br><span class="line">        # Grab all the tokens labeled with I-label</span><br><span class="line">        all_scores = []</span><br><span class="line">        while (</span><br><span class="line">            idx &lt; len(predictions)</span><br><span class="line">            and model.config.id2label[predictions[idx]] == f&quot;I-&#123;label&#125;&quot;</span><br><span class="line">        ):</span><br><span class="line">            all_scores.append(probabilities[idx][pred])</span><br><span class="line">            _, end = offsets[idx]</span><br><span class="line">            idx += 1</span><br><span class="line"></span><br><span class="line">        # The score is the mean of all the scores of the tokens in that grouped entity</span><br><span class="line">        score = np.mean(all_scores).item()</span><br><span class="line">        word = example[start:end]</span><br><span class="line">        results.append(</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;entity_group&quot;: label,</span><br><span class="line">                &quot;score&quot;: score,</span><br><span class="line">                &quot;word&quot;: word,</span><br><span class="line">                &quot;start&quot;: start,</span><br><span class="line">                &quot;end&quot;: end,</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    idx += 1</span><br><span class="line"></span><br><span class="line">print(results)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">[&#123;&#x27;entity_group&#x27;: &#x27;PER&#x27;, &#x27;score&#x27;: 0.9981694, &#x27;word&#x27;: &#x27;Sylvain&#x27;, &#x27;start&#x27;: 11, &#x27;end&#x27;: 18&#125;,</span><br><span class="line"> &#123;&#x27;entity_group&#x27;: &#x27;ORG&#x27;, &#x27;score&#x27;: 0.97960204, &#x27;word&#x27;: &#x27;Hugging Face&#x27;, &#x27;start&#x27;: 33, &#x27;end&#x27;: 45&#125;,</span><br><span class="line"> &#123;&#x27;entity_group&#x27;: &#x27;LOC&#x27;, &#x27;score&#x27;: 0.99321055, &#x27;word&#x27;: &#x27;Brooklyn&#x27;, &#x27;start&#x27;: 49, &#x27;end&#x27;: 57&#125;]&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="QA"><a href="#QA" class="headerlink" title="QA"></a>QA</h1><blockquote>
+<p>QA中我们主要解决文本答案跨段落的问题</p>
+</blockquote>
+<h2 id="pipeline方法-1"><a href="#pipeline方法-1" class="headerlink" title="pipeline方法"></a>pipeline方法</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">from transformers import pipeline</span><br><span class="line"></span><br><span class="line">question_answerer = pipeline(&quot;question-answering&quot;)</span><br><span class="line">context = &quot;&quot;&quot;</span><br><span class="line">🤗 Transformers is backed by the three most popular deep learning libraries — Jax, PyTorch, and TensorFlow — with a seamless integration</span><br><span class="line">between them. It&#x27;s straightforward to train your models with one before loading them for inference with the other.</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">question = &quot;Which deep learning libraries back 🤗 Transformers?&quot;</span><br><span class="line">question_answerer(question=question, context=context)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;score&#x27;: 0.97773,</span><br><span class="line"> &#x27;start&#x27;: 78,</span><br><span class="line"> &#x27;end&#x27;: 105,</span><br><span class="line"> &#x27;answer&#x27;: &#x27;Jax, PyTorch and TensorFlow&#x27;&#125;&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这个pipeline可以处理很长的序列，基本不会截断你的文本，但是过长如果你的答案在截掉的部分，那也没辙了。</p>
+<h2 id="logits-1"><a href="#logits-1" class="headerlink" title="logits"></a>logits</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">from transformers import AutoTokenizer, AutoModelForQuestionAnswering</span><br><span class="line"></span><br><span class="line">model_checkpoint = &quot;distilbert-base-cased-distilled-squad&quot;</span><br><span class="line">tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)</span><br><span class="line">model = AutoModelForQuestionAnswering.from_pretrained(model_checkpoint)</span><br><span class="line"></span><br><span class="line">inputs = tokenizer(question, context, return_tensors=&quot;pt&quot;)</span><br><span class="line">outputs = model(**inputs)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>QA任务中，我们会获得，两个logits，分别是开始的坐标和结束的坐标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">start_logits = outputs.start_logits</span><br><span class="line">end_logits = outputs.end_logits</span><br><span class="line">print(start_logits.shape, end_logits.shape)</span><br><span class="line"># torch.Size([1, 66]) torch.Size([1, 66])</span><br></pre></td></tr></table></figure>
+
+
+
+<p>由于我们的序列包含[CLS]、[SEP]*n，的特殊token所以需要屏蔽这些影响。根据softmax的特性选择填充一个很大的负数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import torch</span><br><span class="line"></span><br><span class="line">sequence_ids = inputs.sequence_ids()</span><br><span class="line"># Mask everything apart from the tokens of the context</span><br><span class="line">mask = [i != 1 for i in sequence_ids]</span><br><span class="line"># Unmask the [CLS] token</span><br><span class="line">mask[0] = False</span><br><span class="line">mask = torch.tensor(mask)[None]</span><br><span class="line"></span><br><span class="line">start_logits[mask] = -10000</span><br><span class="line">end_logits[mask] = -10000</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>sequence_ids会将每个token映射到原本的句子，而特殊token则会标记为None</p>
+<p>如[None, 0,0,0, None, 1,1,1, None] 这里标识的就是 [CLS]…[SEP]….[SEP]</p>
+<p>这里的mask就是跟输出一样的形状他的值是T&#x2F;F, start_logits[mask]就会选择所有True的地方填充-10000</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start_probabilities = torch.nn.functional.softmax(start_logits, dim=-1)[0]</span><br><span class="line">end_probabilities = torch.nn.functional.softmax(end_logits, dim=-1)[0]</span><br></pre></td></tr></table></figure>
+
+<p>上面我们得到了两组向量，形状是 (batch_size, seq_len)  seq_len列表就表示每个坐标的概率</p>
+<p>接下来就像做attention分数矩阵一样，将开始_结束位置的概率匹配上，<code>mask start&gt;end的组合，并取得概率最大的组合</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">start = torch.randn(2,4).softmax(dim=-1)</span><br><span class="line">end = torch.randn(2,4).softmax(dim=-1)</span><br><span class="line">start,end</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">(tensor([[0.1310, 0.3604, 0.1726, 0.3360],</span><br><span class="line">         [0.1955, 0.3245, 0.0700, 0.4101]]),</span><br><span class="line"> tensor([[0.2199, 0.1130, 0.3976, 0.2695],</span><br><span class="line">         [0.0455, 0.0804, 0.0514, 0.8227]]))&#x27;&#x27;&#x27;</span><br><span class="line">         </span><br><span class="line">start.unsqueeze(1).transpose(-1,-2) @ end.unsqueeze(1)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">tensor([[[0.0288, 0.0148, 0.0521, 0.0353],</span><br><span class="line">         [0.0792, 0.0407, 0.1433, 0.0971],</span><br><span class="line">         [0.0380, 0.0195, 0.0686, 0.0465],</span><br><span class="line">         [0.0739, 0.0380, 0.1336, 0.0905]],</span><br><span class="line"></span><br><span class="line">        [[0.0089, 0.0157, 0.0100, 0.1608],</span><br><span class="line">         [0.0148, 0.0261, 0.0167, 0.2670],</span><br><span class="line">         [0.0032, 0.0056, 0.0036, 0.0576],</span><br><span class="line">         [0.0187, 0.0330, 0.0211, 0.3374]]])&#x27;&#x27;&#x27;</span><br><span class="line">         </span><br><span class="line">a[0, 0]* b[0, 1]</span><br><span class="line"># tensor(0.0148)</span><br></pre></td></tr></table></figure>
+
+<p>如上 start(2, 4, 1) @ end(2, 1, 4) &#x3D; (2, 4, 4) 单看(4, 4)的矩阵就是 横为end的坐标，纵为start的坐标 中间就是他们的概率积</p>
+<p>接下里mask掉 不合理的位置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fin = torch.triu(scores)</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">tensor([[[0.0288, 0.0148, 0.0521, 0.0353],</span><br><span class="line">         [0.0000, 0.0407, 0.1433, 0.0971],</span><br><span class="line">         [0.0000, 0.0000, 0.0686, 0.0465],</span><br><span class="line">         [0.0000, 0.0000, 0.0000, 0.0905]],</span><br><span class="line"></span><br><span class="line">        [[0.0089, 0.0157, 0.0100, 0.1608],</span><br><span class="line">         [0.0000, 0.0261, 0.0167, 0.2670],</span><br><span class="line">         [0.0000, 0.0000, 0.0036, 0.0576],</span><br><span class="line">         [0.0000, 0.0000, 0.0000, 0.3374]]])&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这里官网刷了个把戏，代码只是对一个句子的坐标处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fin[0]</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">tensor([[[0.0288, 0.0148, 0.0521, 0.0353],</span><br><span class="line">         [0.0000, 0.0407, 0.1433, 0.0971],</span><br><span class="line">         [0.0000, 0.0000, 0.0686, 0.0465],</span><br><span class="line">         [0.0000, 0.0000, 0.0000, 0.0905]],&#x27;&#x27;&#x27;</span><br><span class="line">         </span><br><span class="line">         </span><br><span class="line">start_index = fin[0].argmax() // 4</span><br><span class="line">end_index = fin[0].argmax() % 4</span><br><span class="line">start_index, end_index, fin[0].argmax()</span><br><span class="line"># 1, 2, 6</span><br></pre></td></tr></table></figure>
+
+<p>（1,2）就是0.1433 也就是开始坐标是1，结束是2，argmax返回的是绝对坐标</p>
+<p>相对应的，做batch处理只要使用循环语句即可</p>
+<h2 id="offset-map"><a href="#offset-map" class="headerlink" title="offset-map"></a>offset-map</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">inputs_with_offsets = tokenizer(question, context, return_offsets_mapping=True)</span><br><span class="line">offsets = inputs_with_offsets[&quot;offset_mapping&quot;]</span><br><span class="line"></span><br><span class="line">start_char, _ = offsets[start_index]</span><br><span class="line">_, end_char = offsets[end_index]</span><br><span class="line">answer = context[start_char:end_char]</span><br></pre></td></tr></table></figure>
+
+<p>这里offsets是元组形式表示一个token结束和开始 如(3, 7)，表示这个token在原文的开始为3结束为7</p>
+<p>取得start_token的最小值，再取得end_token的最大值，中间的区间就是，原文字符串。</p>
+<p>另外offset是除去##等prefix的值，所以不会有影响。</p>
+<h2 id="超长文处理"><a href="#超长文处理" class="headerlink" title="超长文处理"></a>超长文处理</h2><p>对于过长的文章，我们使用trucation截断，并使用overlap进行覆盖，防止答案截成两段没法做答</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sentence = &quot;This sentence is not too long but we are going to split it anyway.&quot;</span><br><span class="line">inputs = tokenizer(</span><br><span class="line">    sentence, truncation=True, return_overflowing_tokens=True, max_length=6, stride=2</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">for ids in inputs[&quot;input_ids&quot;]:</span><br><span class="line">    print(tokenizer.decode(ids))</span><br><span class="line">    </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#x27;[CLS] This sentence is not [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] is not too long [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] too long but we [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] but we are going [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] are going to split [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] to split it anyway [SEP]&#x27;</span><br><span class="line">&#x27;[CLS] it anyway. [SEP]&#x27;&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>如上，我们设定overla的窗口为2 这使得每次截断都有两个词是重叠的，可以看到特殊token并不计算在窗口内</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">print(inputs.keys())</span><br><span class="line"># dict_keys([&#x27;input_ids&#x27;, &#x27;attention_mask&#x27;, &#x27;overflow_to_sample_mapping&#x27;])</span><br><span class="line">print(inputs[&quot;overflow_to_sample_mapping&quot;])</span><br><span class="line">#[0, 0, 0, 0, 0, 0, 0]</span><br></pre></td></tr></table></figure>
+
+<p><code>overflow_to_sample_mapping</code>标记我们截断后的句子来自原文中的哪个句子，具体如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sentences = [</span><br><span class="line">    &quot;This sentence is not too long but we are going to split it anyway.&quot;,</span><br><span class="line">    &quot;This sentence is shorter but will still get split.&quot;,</span><br><span class="line">]</span><br><span class="line">inputs = tokenizer(</span><br><span class="line">    sentences, truncation=True, return_overflowing_tokens=True, max_length=6, stride=2</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">print(inputs[&quot;overflow_to_sample_mapping&quot;])</span><br><span class="line"># [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]</span><br></pre></td></tr></table></figure>
+
+<p>很明显了。</p>
+<p>接下来回到我们长文处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">inputs = tokenizer(</span><br><span class="line">    question,</span><br><span class="line">    long_context,</span><br><span class="line">    stride=128,</span><br><span class="line">    max_length=384,</span><br><span class="line">    padding=&quot;longest&quot;,</span><br><span class="line">    truncation=&quot;only_second&quot;,</span><br><span class="line">    return_overflowing_tokens=True,</span><br><span class="line">    return_offsets_mapping=True,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>QA tokenizer一般第一个位置为question，设定<code>truncation=&quot;only_second&quot;</code>表示只对<code>long_context</code>进行截断</p>
+<p>下面我们处理tokenizer的输出，将不必要的部分pop出去</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">_ = inputs.pop(&quot;overflow_to_sample_mapping&quot;)</span><br><span class="line">offsets = inputs.pop(&quot;offset_mapping&quot;)</span><br><span class="line"></span><br><span class="line">inputs = inputs.convert_to_tensors(&quot;pt&quot;)</span><br><span class="line">print(inputs[&quot;input_ids&quot;].shape)</span><br><span class="line"># torch.Size([2, 384])</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里测试下输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">outputs = model(**inputs)</span><br><span class="line"></span><br><span class="line">start_logits = outputs.start_logits</span><br><span class="line">end_logits = outputs.end_logits</span><br><span class="line">print(start_logits.shape, end_logits.shape)</span><br><span class="line"># torch.Size([2, 384]) torch.Size([2, 384])</span><br></pre></td></tr></table></figure>
+
+<p>处理坐标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sequence_ids = inputs.sequence_ids()</span><br><span class="line">mask = [i != 1 for i in sequence_ids]</span><br><span class="line">mask[0] = False</span><br><span class="line">mask = torch.logical_or(torch.tensor(mask)[None], (inputs[&quot;attention_mask&quot;] == 0))</span><br><span class="line"></span><br><span class="line">start_logits[mask] = -10000</span><br><span class="line">end_logits[mask] = -10000</span><br><span class="line"></span><br><span class="line">start_probabilities = torch.nn.functional.softmax(start_logits, dim=-1)</span><br><span class="line">end_probabilities = torch.nn.functional.softmax(end_logits, dim=-1)</span><br></pre></td></tr></table></figure>
+
+<p><code>torch.logical_or</code>函数做的是或门的处理，只要有非零项就为True，输入的两个矩阵对应位置都为0才输出False</p>
+<p>下面循环处理取得下标</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">candidates = []</span><br><span class="line">for start_probs, end_probs in zip(start_probabilities, end_probabilities):</span><br><span class="line">    scores = start_probs[:, None] * end_probs[None, :]</span><br><span class="line">    idx = torch.triu(scores).argmax().item()</span><br><span class="line"></span><br><span class="line">    start_idx = idx // scores.shape[1]</span><br><span class="line">    end_idx = idx % scores.shape[1]</span><br><span class="line">    score = scores[start_idx, end_idx].item()</span><br><span class="line">    candidates.append((start_idx, end_idx, score))</span><br><span class="line"></span><br><span class="line">print(candidates)</span><br><span class="line"># [(0, 18, 0.33867), (173, 184, 0.97149)]</span><br></pre></td></tr></table></figure>
+
+
+
+<p>通过之前保存的offset映射到原文</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">for candidate, offset in zip(candidates, offsets):</span><br><span class="line">    start_token, end_token, score = candidate</span><br><span class="line">    start_char, _ = offset[start_token]</span><br><span class="line">    _, end_char = offset[end_token]</span><br><span class="line">    answer = long_context[start_char:end_char]</span><br><span class="line">    result = &#123;&quot;answer&quot;: answer, &quot;start&quot;: start_char, &quot;end&quot;: end_char, &quot;score&quot;: score&#125;</span><br><span class="line">    print(result)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">&#123;&#x27;answer&#x27;: &#x27;\n🤗 Transformers: State of the Art NLP&#x27;, &#x27;start&#x27;: 0, &#x27;end&#x27;: 37, &#x27;score&#x27;: 0.33867&#125;</span><br><span class="line">&#123;&#x27;answer&#x27;: &#x27;Jax, PyTorch and TensorFlow&#x27;, &#x27;start&#x27;: 1892, &#x27;end&#x27;: 1919, &#x27;score&#x27;: 0.97149&#125;&#x27;&#x27;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>以上就是QA的一般处理，但是对一般的数据集来说，他的答案下标跟你truncation之后的是有偏差的，所以对原文答案的map要另做处理。</p>
+</article><div class="post-copyright"><div class="post-copyright__title"><span class="post-copyright-info"><h>HF Course 07 NER QA Tokenizer</h></span></div><div class="post-copyright__type"><span class="post-copyright-info"><a href="https://poyone.github.io/posts/37742.html">https://poyone.github.io/posts/37742.html</a></span></div><div class="post-copyright-m"><div class="post-copyright-m-info"><div class="post-copyright-a"><h>作者</h><div class="post-copyright-cc-info"><h>Poy One</h></div></div><div class="post-copyright-c"><h>发布于</h><div class="post-copyright-cc-info"><h>2022-12-11</h></div></div><div class="post-copyright-u"><h>更新于</h><div class="post-copyright-cc-info"><h>2022-12-12</h></div></div><div class="post-copyright-c"><h>许可协议</h><div class="post-copyright-cc-info"><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a rel="noopener" target="_blank" title="CC BY-NC-SA 4.0" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a></div></div></div></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Huggingface/">Huggingface</a></div><div class="post_share"><div class="social-share" data-image="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/7193.html"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HF Course 08 Tokenizer底层算法</div></div></a></div><div class="next-post pull-right"><a href="/posts/55913.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris11.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">HF Course 06 继承式的Tokenizer</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/58033.html" title="NLP Baseline 01 翻译"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/Asuka/Asuka26.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-05</div><div class="title">NLP Baseline 01 翻译</div></div></a></div><div><a href="/posts/16149.html" title="HF Course 01 基础概念"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 01 基础概念</div></div></a></div><div><a href="/posts/64185.html" title="HF Course 02 API概要"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 02 API概要</div></div></a></div><div><a href="/posts/18130.html" title="HF Course 03 微调范式"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris40.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="title">HF Course 03 微调范式</div></div></a></div><div><a href="/posts/4498.html" title="HF Course 04 Dataset"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 04 Dataset</div></div></a></div><div><a href="/posts/5596.html" title="HF Course 05 faiss 搜索引擎"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/Eris32.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-11</div><div class="title">HF Course 05 faiss 搜索引擎</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://npm.elemecdn.com/poyone1222/eris/eris11.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Poy One</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/poyone"><i></i><span>🛴前往github...</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/poyone" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:poyone1222@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客 <br> QQ 914987163</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%B0%E5%BE%97%E6%8E%92%E7%89%88-%E5%88%86%E5%89%B2%E7%BA%BF"><span class="toc-text">记得排版 分割线</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%85%E5%AE%8C%E6%88%90"><span class="toc-text">待完成</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Fast-Tokenizer"><span class="toc-text">Fast Tokenizer</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NER"><span class="toc-text">NER</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pipeline%E6%96%B9%E6%B3%95"><span class="toc-text">pipeline方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#logits"><span class="toc-text">logits</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%81%8F%E7%A7%BB%E9%87%8Fpostprocessing"><span class="toc-text">偏移量postprocessing</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#QA"><span class="toc-text">QA</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pipeline%E6%96%B9%E6%B3%95-1"><span class="toc-text">pipeline方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#logits-1"><span class="toc-text">logits</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#offset-map"><span class="toc-text">offset-map</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B6%85%E9%95%BF%E6%96%87%E5%A4%84%E7%90%86"><span class="toc-text">超长文处理</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By Poy One</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script defer src="/js/light.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show","#web_bg",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka15.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/CV/&quot;);" href="javascript:void(0);">CV</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">计算机视觉</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka22.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/NLP/&quot;);" href="javascript:void(0);">NLP</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr">自然语言处理</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka10.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Trick/&quot;);" href="javascript:void(0);">Trick</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr">import torch as tf</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka29.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Dive-Into-Paper/&quot;);" href="javascript:void(0);">Dive Into Paper</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">论文精读</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka16.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Python/&quot;);" href="javascript:void(0);">Python</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr">流畅的Python</span></li><li class="categoryBar-list-item" style="background:url(https://npm.elemecdn.com/poyone1222/Asuka/Asuka32.webp);"> <a class="categoryBar-list-link" onclick="pjax.loadUrl(&quot;categories/Universe/&quot;);" href="javascript:void(0);">Universe</a><span class="categoryBar-list-count">14</span><span class="categoryBar-list-descr">拥有一切 却变成太空</span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><!-- hexo injector body_end end --></body></html>
